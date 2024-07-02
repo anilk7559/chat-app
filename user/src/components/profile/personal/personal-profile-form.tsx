@@ -1,9 +1,7 @@
 import { City, Country, State } from 'country-state-city';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import { Component } from 'react';
-import {
-  Col, Form, FormControl, Row
-} from 'react-bootstrap';
+import { Col, Form, FormControl, Row} from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import AvatarComponent from 'src/components/profile/personal/avatar-box';
@@ -21,6 +19,7 @@ interface FormValues {
   state: string;
   city: string;
   country: string;
+  postCode: string;
 }
 
 const schema = Yup.object().shape({
@@ -39,7 +38,8 @@ const schema = Yup.object().shape({
   address: Yup.string(),
   state: Yup.string(),
   city: Yup.string(),
-  country: Yup.string()
+  country: Yup.string(),
+  postCode: Yup.string()
 });
 
 
@@ -115,7 +115,8 @@ class PersonalProfileForm extends Component<any, any> {
               address: authUser?.address,
               state: authUser?.state,
               city: authUser?.city,
-              country: authUser?.country
+              country: authUser?.country,
+              postCode: authUser?.postCode
             }}
             onSubmit={(values: FormValues, formikHelpers: FormikHelpers<FormValues>) => {
               this.props.updateProfile({ ...values });
@@ -153,6 +154,7 @@ class PersonalProfileForm extends Component<any, any> {
                         <div className="invalid-feedback">{props.errors.username}</div>
                       </Form.Group>
                     </Col>
+                    <p className='text-muted mx-auto'>Diese Daten werden nicht im Profil angezeigt</p>
                     <Col md={6} xs={12}>
                       <Form.Group>
                         <Form.Label>E-Mail Adresse</Form.Label>
@@ -281,6 +283,21 @@ class PersonalProfileForm extends Component<any, any> {
                           value={props.values.address}
                         />
                         <div className="invalid-feedback">{props.errors.address}</div>
+                      </Form.Group>
+                      <Form.Group>
+                        <Form.Label>Postleitzahl</Form.Label>
+                        <FormControl
+                          isInvalid={props.touched.postCode && !!props.errors.postCode}
+                          name="postCode"
+                          id="postCode"
+                          type="text"
+                          className="form-control form-control-md"
+                          placeholder="Ihre Postleitzahl"
+                          onChange={props.handleChange}
+                          onBlur={props.handleBlur}
+                          value={props.values.postCode}
+                        />
+                        <div className="invalid-feedback">{props.errors.postCode}</div>
                       </Form.Group>
                     </Col>
                     <Col xs={4}>

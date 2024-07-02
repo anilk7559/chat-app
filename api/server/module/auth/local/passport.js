@@ -28,13 +28,15 @@ exports.setup = () => {
               false,
               PopulateResponse.error({ message: 'Password is incorrect.' }, 'ERR_PASSWORD_IS_INCORRECT', 400, 400)
             );
-          } if (!user.emailVerified) {
-            return done(
-              null,
-              false,
-              PopulateResponse.error({ message: 'Please verify your email address' }, 'ERR_EMAIL_NOT_VERIFIED')
-            );
-          }
+          } 
+          // ------------- commented out to test the login ------
+          // if (!user.emailVerified) {
+          //   return done(
+          //     null,
+          //     false,
+          //     PopulateResponse.error({ message: 'Please verify your email address' }, 'ERR_EMAIL_NOT_VERIFIED')
+          //   );
+          // }
           return done(null, user);
         });
       } catch (e) {

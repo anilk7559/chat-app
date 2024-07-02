@@ -4,13 +4,15 @@ const MONGOOSE_RECONNECT_MS = 1000;
 
 async function reconnect() {
   try {
-    mongoose.set('strictQuery', true); 
+    mongoose.set('strictQuery', true);
     await mongoose.connect(process.env.MONGO_URI, {
-      useUnifiedTopology: true
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     });
+    console.info(`Successfully connected to MongoDB Atlas`);
   } catch (err) {
-    console.error(err);
-    console.info(`attempting to reconnect in (${MONGOOSE_RECONNECT_MS}) ms`);
+    console.error('Error connecting to MongoDB Atlas:', err);
+    console.info(`Attempting to reconnect in ${MONGOOSE_RECONNECT_MS} ms`);
     setTimeout(() => {
       reconnect();
     }, MONGOOSE_RECONNECT_MS);
@@ -19,18 +21,19 @@ async function reconnect() {
 
 exports.core = async () => {
   mongoose.connection.on('connected', () => {
-    if (['development'].indexOf(process.env.NODE_ENV) > -1) {
-      console.info(`mongoose connection open to ${process.env.MONGO_URI}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.info(`Mongoose connected to ${process.env.MONGO_URI}`);
     }
   });
 
-  // if the connection throws an error
-  mongoose.connection.on('error', console.error);
+  mongoose.connection.on('error', (err) => {
+    console.error('Mongoose connection error:', err);
+  });
 
-  // when the connection is disconnected
-  mongoose.connection.on('disconnected', () => console.info('mongoose disconnected'));
+  mongoose.connection.on('disconnected', () => {
+    console.info('Mongoose disconnected');
+  });
 
-  // connect to mongodb
   await reconnect();
 
   return mongoose;

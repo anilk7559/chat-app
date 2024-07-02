@@ -51,29 +51,26 @@ class Upload extends Component<IProps, any> {
 
   async uploadFiles() {
     this.setState({ uploadProgress: {}, uploading: true });
-    const promises = [] as any;
-    this.state.files.forEach((file: any) => {
-      promises.push(this.sendRequest(file));
-    });
+    const promises = this.state.files.map((file) => this.sendRequest(file));
     try {
-      const res = await Promise.all(promises);
-      this.props.onCompletedAll && this.props.onCompletedAll(res);
-      this.setState({ successfullUploaded: true, uploading: false });
-    } catch (e) {
+      const responses = await Promise.all(promises);
+      this.props.onCompletedAll && this.props.onCompletedAll(responses);
+      this.setState({ successfulUploaded: true, uploading: false });
+    } catch (error) {
+      console.log('====================================');
+      console.log(error?.message);
+      console.log('====================================');
       toast.error('Upload fehlgeschlagen! Bitte überprüfen Sie es.');
-
-      // Not Production ready! Do some error handling here instead...
-      this.setState({ successfullUploaded: true, uploading: false });
+      this.setState({ successfulUploaded: true, uploading: false });
     }
   }
 
-  sendRequest(file: any) {
+  sendRequest(file: File) {
     return new Promise((resolve, reject) => {
       const req = new XMLHttpRequest();
 
       req.upload.addEventListener('progress', (event) => {
         if (event.lengthComputable) {
-          // eslint-disable-next-line react/no-access-state-in-setstate
           const copy = { ...this.state.uploadProgress };
           copy[file.name] = {
             state: 'pending',
@@ -83,32 +80,23 @@ class Upload extends Component<IProps, any> {
         }
       });
 
-      // eslint-disable-next-line consistent-return
       req.addEventListener('load', () => {
         const success = req.status >= 200 && req.status < 300;
-        if (!success) {
-          // eslint-disable-next-line react/no-access-state-in-setstate
-          const copy = { ...this.state.uploadProgress };
-          copy[file.name] = { state: 'error', percentage: 0 };
-          this.setState({ uploadProgress: copy });
-          return reject(req.response);
-        }
-
-        // eslint-disable-next-line react/no-access-state-in-setstate
         const copy = { ...this.state.uploadProgress };
-        copy[file.name] = { state: 'done', percentage: 100 };
-
+        copy[file.name] = {
+          state: success ? 'done' : 'error',
+          percentage: success ? 100 : 0
+        };
         this.setState({ uploadProgress: copy });
-        const res = req.response;
-        if (this.props.onComplete) {
-          this.props.onComplete(res);
+        if (success) {
+          resolve(req.response);
+          this.props.onComplete && this.props.onComplete(req.response);
+        } else {
+          reject(req.response);
         }
-
-        resolve(res);
       });
 
-      req.upload.addEventListener('error', () => {
-        // eslint-disable-next-line react/no-access-state-in-setstate
+      req.addEventListener('error', () => {
         const copy = { ...this.state.uploadProgress };
         copy[file.name] = { state: 'error', percentage: 0 };
         this.setState({ uploadProgress: copy });
@@ -118,9 +106,10 @@ class Upload extends Component<IProps, any> {
       const formData = new FormData();
       formData.append('file', file, file.name);
 
-      // check if have custom fields
       if (this.props.customFields) {
-        Object.keys(this.props.customFields).forEach((key) => formData.append(key, this.props.customFields[key]));
+        Object.keys(this.props.customFields).forEach((key) => {
+          formData.append(key, this.props.customFields[key]);
+        });
       }
 
       req.responseType = 'json';
@@ -130,6 +119,7 @@ class Upload extends Component<IProps, any> {
       if (accessToken) {
         req.setRequestHeader('Authorization', `Bearer ${accessToken}`);
       }
+
       req.send(formData);
     });
   }
@@ -179,27 +169,27 @@ class Upload extends Component<IProps, any> {
     return (
       <div className="file-upload">
         <Dropzone
-          onFilesAdded={this.onFilesAdded}
-          disabled={this.state.uploading || this.state.successfullUploaded}
-          config={this.props.config}
-          ref={this.zoneRef}
+          onFilesAdded={this?.onFilesAdded}
+          disabled={this?.state?.uploading || this?.state?.successfullUploaded}
+          config={this?.props?.config}
+          ref={this?.zoneRef}
         />
         <div className="file-upload-content">
-          {this.state.files.map((file: any, index: number) => {
+          {this?.state?.files.map((file: any, index: number) => {
             const img = URL.createObjectURL(file);
             return (
-              <div key={file.name} className="Row">
+              <div key={file?.name} className="Row">
                 {file.type.indexOf('image') > -1 && (
                   <>
                     <img src={img} alt="img" className="file-upload-image" />
-                    <button type="button" onClick={(evt) => this.removeItem(evt, index)} className="remove-image">
+                    <button type="button" onClick={(evt) => this?.removeItem(evt, index)} className="remove-image">
                     Entfernen
                       {' '}
                       <span className="image-title">Hochgeladenes Bild</span>
                     </button>
                   </>
                 )}
-                <span className="Filename">{file.name}</span>
+                <span className="Filename">{file?.name}</span>
                 {this.renderProgress(file)}
               </div>
             );

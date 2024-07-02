@@ -65,7 +65,7 @@ function ModelList({
         isFriend: true
       })
       : await userService.find(requestQuery);
-    setData(resp.data);
+    setData(resp?.data);
     setLoading(false);
   };
 
@@ -79,19 +79,27 @@ function ModelList({
   };
 
   const onUserFilter = (value) => {
-    if (value !== 'location') {
+    if (value === 'location') {
+      setShowLocation(true);
+    } else {
       setShowLocation(false);
       const newQuery = {
         ...query,
+        gender: undefined,
         country: undefined,
         state: undefined,
         city: undefined,
-        gender: value
+        postCode: undefined // Reset postCode if another filter is selected
       };
+
+      if (value === 'male' || value === 'female' || value === 'transgender') {
+        newQuery.gender = value;
+      } else if (/^\d{5}$/.test(value)) { // Check if value is a valid 5-digit postCode
+        newQuery.postCode = value;
+      }
+
       setQuery(newQuery);
       search(newQuery);
-    } else {
-      setShowLocation(true);
     }
   };
 

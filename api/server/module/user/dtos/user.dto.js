@@ -19,6 +19,7 @@ class UserDto {
       'address',
       'city',
       'state',
+      'postCode',
       'country',
       'balance',
       'isOnline',

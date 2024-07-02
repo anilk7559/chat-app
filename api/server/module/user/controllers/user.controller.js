@@ -23,6 +23,7 @@ exports.create = async (req, res, next) => {
       password: Joi.string().min(8).required(),
       balance: Joi.number().min(0).allow(null).optional(),
       address: Joi.string().allow(null, '').optional(),
+      postCode: Joi.string().allow(null, '').optional(),
       state: Joi.string().allow(null, '').optional(),
       city: Joi.string().allow(null, '').optional(),
       country: Joi.string().allow(null, '').optional(),
@@ -234,7 +235,23 @@ exports.search = async (req, res, next) => {
         isBlocked: false
       };
     }
-    const sort = Helper.App.populateDBSort(req.query);
+
+    if (req.query.postCode) {
+      const postCodePrefix = req.query.postCode.slice(0, 2);
+      query = {
+        ...query,
+        postCode: { $regex: `^${postCodePrefix}` }
+      };
+    }
+
+    // Set default sort to balance descending
+    let sort = { balance: -1 };
+
+    // Check if there's a custom sort parameter in the query
+    if (req.query.sort) {
+      sort = Helper.App.populateDBSort(req.query);
+    }
+
     const count = await DB.User.count(query);
     const items = await DB.User.find(query)
       .collation({ locale: 'en' })
@@ -370,7 +387,8 @@ exports.updateProfile = async (req, res, next) => {
       state: Joi.string().allow('', null).optional(),
       country: Joi.string().allow('', null).optional(),
       phoneNumber: Joi.string().allow('', null).optional(),
-      email: Joi.string().email().required()
+      email: Joi.string().email().required(),
+      postCode: Joi.string().allow('', null).optional()
     });
 
     const validate = schema.validate(req.body);

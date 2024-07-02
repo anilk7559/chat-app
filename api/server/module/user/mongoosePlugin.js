@@ -57,6 +57,10 @@ exports.User = (schema) => {
       type: String,
       default: ''
     },
+    postCode: {
+      type: String,
+      default: ''
+    },
     balance: {
       type: Number,
       default: 0

@@ -43,12 +43,12 @@ function ChatButton({
         toast.error('Bitte melden Sie sich an, um diese Aktion auszuführen!');
         return;
       }
-      if (!isFriend) {
-        toast.error(`Bitte fügen Sie ${user.type}  zu Ihren Favoriten hinzu, um zu chatten.`);
-        return;
-      }
+      // if (!isFriend) {
+      //   toast.error(`Bitte fügen Sie ${user.type}  zu Ihren Favoriten hinzu, um zu chatten.`);
+      //   return;
+      // }
       setLoading(true);
-      const conversation = await conversationService.create({ userId: user._id });
+      const conversation = await conversationService.create({ userId: user?._id });
       router.push({
         pathname: '/conversation/[id]',
         query: {

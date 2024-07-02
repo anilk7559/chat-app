@@ -96,8 +96,8 @@ Application.getInitialProps = wrapper.getInitialAppProps((store) => async (conte
     await loadUser(ctx, store);
   }
   if (typeof window === 'undefined') {
-    const configRes = await systemService.getConfig();
-    const menus = await systemService.getMenus('footer');
+    const configRes = await systemService?.getConfig();
+    const menus = await systemService?.getMenus('footer');
     store.dispatch(loadConfigSuccess(configRes.data));
     store.dispatch(setMenu({
       section: 'footer',
