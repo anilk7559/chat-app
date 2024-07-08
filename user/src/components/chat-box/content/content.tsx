@@ -97,7 +97,7 @@ function ChatContent({ items = null, authUser = null }: IProps) {
                 <div className={`message-content + ${message.type === 'text' && 'bg-primary-custom'}`}>
                   {message.type === 'text' && <span>{message.text}</span>}
                   {(message.type === 'photo' || message.type === 'video') && message.files && (
-                  <MediaContent type={message.type} items={message.files} download />
+                  <MediaContent sender={message.sender} type={message.type} items={message.files} download />
                   )}
                   {message.type === 'file' && message.files && (
                   <div className="document">

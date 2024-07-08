@@ -1,3 +1,4 @@
+import { sellItemService } from '@services/sell-item.service';
 import { useEffect, useState } from 'react';
 import {
   Col, Row, Tab, Tabs
@@ -43,7 +44,13 @@ function ContactFooter({
   const [mediaItem, setMediaItem] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [titleModal, setTitleModal] = useState('');
+  const [photoFolders, setPhotoFolders] = useState([]);
   const take = 8;
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+
+  const handleFolderClick = (folderId: string) => {
+    setSelectedFolderId(folderId === selectedFolderId ? null : folderId);
+  };
 
   const dispatch = useDispatch();
 
@@ -58,8 +65,16 @@ function ContactFooter({
       }));
     }
   };
+
+  const fetchData  = async ()=> {
+    const resp2 = await sellItemService.getModelSellItems({ page: 1, mediaType: 'photo', take: 9 });
+    setPhotoFolders(resp2?.data?.folders);
+    console.log(resp2.data, "response 4444444");
+  }
+
   useEffect(() => {
     gettSellItemRequesting();
+    fetchData()
   }, [getSellItemStore.requesting]);
 
   useEffect(() => {
@@ -92,50 +107,84 @@ function ContactFooter({
         <Tab eventKey="photo" title="Fotos">
           {isLoading && <Loader />}
           {!isLoading && items && items.length > 0 && (
-            <div className="row min-h ">
-                {items.map((item) => (
-                  <div className="col-xs-6 col-sm-4 col-md-3 responsive-width" key={item._id}>
-                    <div className={item.isPurchased || item.free ? 'image-box mt-3 active' : 'image-box mt-3'}>
-                      <img alt="" src={item.isPurchased || item.free ? item.media?.thumbUrl || '/images/default_thumbnail_photo.jpg' : item.media?.blurUrl || '/images/default_thumbnail_photo.jpg'} />
-                      <h5>
-                        {item.isPurchased || item.free ? (
-                          <span>
-                            <i className="far fa-eye" />
-                            {' '}
-                            Vorschau
-                          </span>
-                        ) : (
-                          <span>
-                            <NumericFormat thousandSeparator value={item.price} displayType="text" />
-                            {' '}
-                            Tokens
-                          </span>
-                        )}
-                      </h5>
-                      <a
-                        aria-hidden
-                        className="btn btn-primary pointer"
-                        onClick={() => (isFriend ? handlePurchase(item) : toast.error('Bitte fügen Sie das Modell zu Ihren Favoriten hinzu, um den Artikel zu kaufen.'))}
-                      >
-                        Jetzt kaufen
-                      </a>
-                      <a
-                        aria-hidden
-                        className="popup"
-                        role="button"
-                        onClick={(e) => handleView(e, item)}
-                        style={{ cursor: `${item.isPurchased || item.free ? 'pointer' : 'unset'}` } as any}
-                      >
-                        {}
-                      </a>
-                      <div className="overlay" />
-                    </div>
-                    <div className="media-name" data-toggle="tooltip" data-placement="top" title={item.name}>
-                      {item.name}
-                    </div>
-                  </div>
-                ))}
-            </div>
+            <Row>
+            {photoFolders?.map((folder, index) => (
+              <Row className="min-h" key={index}>
+                <Col xs={12}>
+                  <section
+                    onClick={() => handleFolderClick(folder._id)}
+                    style={{ cursor: 'pointer', margin: '10px', border: selectedFolderId === folder._id ? '' : '1px solid #eee', display: selectedFolderId && selectedFolderId !== folder._id ? 'none' : 'block' }}
+                    className='image-box mt-1 mb-1 active'
+                  >
+                    <img
+                      style={{ display: selectedFolderId === folder._id ? 'none' : 'block', objectFit: 'cover' }}
+                      src={folder?.sellItems?.[0]?.media?.thumbUrl || '/images/default_thumbnail_photo.jpg'}
+                      alt="media_thumb_photo"
+                    />
+                    <button
+                      style={{ width: '100%', height: '100%', backgroundColor: '#FF337C', color: 'white', border: 'none', padding: '10px' }}
+                      className=''
+                    >
+                      {selectedFolderId === folder._id ? "Go back" : folder.name}
+                    </button>
+                  </section>
+                </Col>
+                {selectedFolderId === folder._id && (
+                  folder.sellItems.length > 0 ? (
+                    folder.sellItems.map((item, indx) => (
+                      <Col xs={6} sm={3} md={3} xxl={4} className="responsive-width" key={item._id}>
+                        <div className={item.isPurchased || item.free ? 'image-box mt-3 active' : 'image-box mt-3'}>
+                          <img
+                            alt=""
+                            src={item.isPurchased || item.free ? item.media?.thumbUrl || '/images/default_thumbnail_photo.jpg' : item.media?.blurUrl || '/images/default_thumbnail_photo.jpg'}
+                          />
+                          <h5>
+                            {item.isPurchased || item.free ? (
+                              <span>
+                                <i className="far fa-eye" />
+                                {' '}
+                                Vorschau
+                              </span>
+                            ) : (
+                              <span>
+                                <NumericFormat thousandSeparator value={item.price} displayType="text" />
+                                {' '}
+                                Tokens
+                              </span>
+                            )}
+                          </h5>
+                            <a
+                              aria-hidden
+                              className="btn btn-primary pointer"
+                              onClick={() => (isFriend ? handlePurchase(item) : toast.error('Bitte fügen Sie das Modell zu Ihren Favoriten hinzu, um den Artikel zu kaufen.'))}
+                            >
+                              Jetzt kaufen
+                            </a>
+                          <a
+                            aria-hidden
+                            className="popup"
+                            role="button"
+                            onClick={(e) => handleView(e, item)}
+                            style={{ cursor: `${item.isPurchased || item.free ? 'pointer' : 'unset'}` } as any}
+                          >
+                            {}
+                          </a>
+                          <div className="overlay" />
+                        </div>
+                        <div className="media-name" data-toggle="tooltip" data-placement="top" title={item.name}>
+                          {item.name}
+                        </div>
+                      </Col>
+                    ))
+                  ) : (
+                    <Col>
+                      <p className="text-alert-danger">Sie haben kein Foto verfügbar!</p>
+                    </Col>
+                  )
+                )}
+              </Row>
+            ))}
+          </Row>
           )}
         </Tab>
         <Tab eventKey="video" title="Videos">
@@ -202,7 +251,7 @@ function ContactFooter({
           sind verfügbar!
         </p>
       )}
-      {total > 0 && total > take ? <MainPaginate currentPage={page} pageTotal={total} pageNumber={take} setPage={setPage} /> : null}
+      {total > 0 && total > take ? <MainPaginate currentPage={page} pageTotal={photoFolders.length} pageNumber={take} setPage={setPage} /> : null}
       <ViewMediaItem
         titleModal={titleModal}
         mediaItem={mediaItem}

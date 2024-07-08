@@ -60,6 +60,8 @@ const messageSagas = [
       try {
         yield put(sendMessageRequesting());
         const resp = yield messageService.send(data.payload);
+        console.log(resp.data, "mesage resp");
+        
         yield put(sendMessageSuccess(resp.data));
         yield put(updateLastMessage(resp.data));
         yield put(updateUnreadMessageCount(resp.data?.conversationId));

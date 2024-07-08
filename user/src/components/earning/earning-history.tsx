@@ -42,6 +42,7 @@ function EarningHistory({
     { name: 'Status', value: 'status' },
     { name: 'Erstellt am', value: 'createdAt' }
   ];
+  const totalBalance = items?.reduce((acc, item) => acc + (item.balance || 0), 0);
 
   return (
     <>
@@ -91,6 +92,31 @@ function EarningHistory({
           )}
         </tbody>
       </Table>
+
+      <article style={{display: 'flex', justifyContent: 'space-between', padding: '2vw', backgroundColor: '#f5f5f5', boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)'}}>
+      <aside style={{width: '45%'}}>
+        <div style={{display: 'flex', width: '40%', justifyContent: 'space-evenly',
+      alignItems: 'center',}}>
+        <span >Model</span>
+        <span>Provision</span>
+        <span></span>
+
+      </div>
+
+      <main style={{backgroundColor: '#ff337c', color: 'white', width: '100%', borderTopRightRadius: '5vw', borderBottomRightRadius: '5vw',
+      display: 'flex', justifyContent: 'space-evenly',
+      alignItems: 'center', padding: '1vw'}} className='flex'>
+        <p style={{marginLeft: '-1vw'}}>Starter</p>
+        <p>20%</p>
+        <p>Auf jede Einnahme wird eine Provision von 20% erhoben.</p>
+      </main>
+      </aside>
+      <section style={{marginTop: '1vw'}}>
+        <span>Gesamteinnahmen</span> <br />
+        <span style={{marginLeft: '4vw'}}>{totalBalance.toFixed(2)}</span>
+      </section>
+      </article>
+      
       <TableFooterBasic changePage={(value) => handleGetEarning({ page: value.data })} page={page} take={take} total={total} />
     </>
 

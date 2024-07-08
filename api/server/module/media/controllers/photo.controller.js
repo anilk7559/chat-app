@@ -24,24 +24,41 @@ exports.upload = async (req, res, next) => {
 
     const file = req.file || req.base64Photo;
     const schema = Joi.object()
-      .keys({
-        name: Joi.string().allow('', null).optional(),
-        description: Joi.string().allow('', null).optional()
-      })
-      .unknown();
+    .keys({
+      name: Joi.string().allow('', null).optional(),
+      description: Joi.string().allow('', null).optional(),
+      price: Joi.number().allow(null).optional(), // Add necessary fields for SellItem
+      mediaType: Joi.string().allow(null).optional(),
+    })
+    .unknown();
 
-    const validate = schema.validate(req.body);
-    if (validate.error) {
-      return next(PopulateResponse.validationError(validate.error));
-    }
+  const validate = schema.validate(req.body);
+  if (validate.error) {
+    return next(PopulateResponse.validationError(validate.error));
+  }
 
-    const photo = await Service.Media.createPhoto({
-      value: validate.value,
-      user: req.user,
-      file
+  // Create the photo
+  const photo = await Service.Media.createPhoto({
+    value: validate.value,
+    user: req.user,
+    file
+  });
+
+    const sellItem = new DB.SellItem({
+      ownerId: req.user._id,
+      mediaId: photo._id,
+      price: validate.value.price,
+      mediaType: validate.value.mediaType,
+      name: validate.value.name,
+      description: validate.value.description,
+      isApproved: false, // Set default approval status
+      createdAt: new Date()
     });
 
+    await sellItem.save();
+
     res.locals.photo = photo;
+    res.locals.sellItem = sellItem;
     return next();
   } catch (e) {
     return next(e);

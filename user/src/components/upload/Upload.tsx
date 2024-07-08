@@ -1,4 +1,4 @@
-import { Component, createRef } from 'react';
+import { Component, createRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { authService } from 'src/services/auth.service';
 
@@ -21,7 +21,10 @@ interface IProps {
   customFields?: any; // add custom field in form data
   // eslint-disable-next-line react/require-default-props
   onRemove?: Function;
-}
+  // eslint-disable-next-line react/require-default-props
+  isChecked: boolean;
+} 
+
 class Upload extends Component<IProps, any> {
   private zoneRef: any = createRef();
 
@@ -37,6 +40,7 @@ class Upload extends Component<IProps, any> {
     this.onFilesAdded = this.onFilesAdded.bind(this);
     this.uploadFiles = this.uploadFiles.bind(this);
     this.sendRequest = this.sendRequest.bind(this);
+
   }
 
   onFilesAdded(files: any) {
@@ -49,7 +53,20 @@ class Upload extends Component<IProps, any> {
     );
   }
 
-  async uploadFiles() {
+  handleChecked(){
+    if (!this?.props.isChecked) {
+      console.log(this?.props?.isChecked, "checked");
+      toast.error('Bitte wählen Sie das Kontrollkästchen, um fortzufahren.');
+      return;
+    }
+    }
+    
+    async uploadFiles() {
+      if (!this.props.isChecked) {
+      console.log(this?.props?.isChecked, "checked");
+      toast.error('Bitte wählen Sie das Kontrollkästchen, um fortzufahren.');
+      return;
+    }
     this.setState({ uploadProgress: {}, uploading: true });
     const promises = this.state.files.map((file) => this.sendRequest(file));
     try {
@@ -57,9 +74,6 @@ class Upload extends Component<IProps, any> {
       this.props.onCompletedAll && this.props.onCompletedAll(responses);
       this.setState({ successfulUploaded: true, uploading: false });
     } catch (error) {
-      console.log('====================================');
-      console.log(error?.message);
-      console.log('====================================');
       toast.error('Upload fehlgeschlagen! Bitte überprüfen Sie es.');
       this.setState({ successfulUploaded: true, uploading: false });
     }
@@ -156,21 +170,21 @@ class Upload extends Component<IProps, any> {
         successfullUploaded: false,
         files
       },
-      () => {
-        if (!files.length) {
-          this.zoneRef.current.resetFileInput();
-        }
-      }
+      // () => {
+      //   if (!files.length) {
+      //     this?.zoneRef?.current?.resetFileInput();
+      //   }
+      // }
     );
     onRemove && onRemove(files);
   }
 
   render() {
     return (
-      <div className="file-upload">
+      <div onClick={()=> this.handleChecked()} className="file-upload">
         <Dropzone
           onFilesAdded={this?.onFilesAdded}
-          disabled={this?.state?.uploading || this?.state?.successfullUploaded}
+          disabled={!this.props.isChecked || this?.state?.uploading || this?.state?.successfullUploaded}
           config={this?.props?.config}
           ref={this?.zoneRef}
         />

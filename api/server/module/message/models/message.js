@@ -19,6 +19,9 @@ const schema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'User'
     },
+    price: {
+      type: Number
+    },
     text: {
       type: String
     },
@@ -74,5 +77,7 @@ schema.virtual('files', {
   foreignField: '_id',
   justOne: false
 });
+
+
 
 module.exports = schema;

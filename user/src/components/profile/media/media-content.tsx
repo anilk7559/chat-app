@@ -2,6 +2,7 @@ import Loading from '@components/common-layout/loading/loading';
 import { sellItemService } from '@services/sell-item.service';
 import { useEffect, useState } from 'react';
 import {
+  Button,
   Col, Row, Tab, Tabs
 } from 'react-bootstrap';
 import { toast } from 'react-toastify';
@@ -26,13 +27,17 @@ function MediaContent({
   const [itemUpdate, setItemUpdate] = useState(null as any);
   const [loading, setLoading] = useState(false);
   const take = 9;
+  const [photoFolders, setPhotoFolders] = useState([])
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+
 
   const getSellItemPhoto = async () => {
     try {
       setLoading(true);
       const resp = await sellItemService.getMySellItem({ page: pagePhoto, mediaType: 'photo', take });
-      setItemsPhoto(resp.data.items);
-      setTotalPhoto(resp.data.count);
+      setPhotoFolders(resp?.data?.folders)
+      setItemsPhoto(resp.data.folders[0]?.sellItems);
+      setTotalPhoto(resp.data?.folders?.length);
     } catch (e) {
       const err = await e;
       toast.error(err?.message || 'Das Laden meines Verkaufsartikelfotos ist fehlgeschlagen');
@@ -45,7 +50,7 @@ function MediaContent({
     try {
       setLoading(true);
       const resp = await sellItemService.getMySellItem({ page: pageVideo, mediaType: 'video', take });
-      setItemsVideo(resp.data.items);
+      setItemsVideo(resp.data.folders[0]?.sellItems);
       setTotalVideo(resp.data.count);
     } catch (e) {
       const err = await e;
@@ -109,6 +114,10 @@ function MediaContent({
     setIsUpdateShow(true);
   };
 
+  const handleFolderClick = (folderId: string) => {
+    setSelectedFolderId(folderId === selectedFolderId ? null : folderId);
+  };
+
   const handleOpenMedia = (item: any) => {
     openMedia(item);
   };
@@ -132,10 +141,6 @@ function MediaContent({
 
   return (
     <div className="card mb-3">
-      {/* <div className="card-header">
-        <h6 className="mb-1">Your Gallery</h6>
-        <p className="mb-0 text-muted small">Update your photos & videos</p>
-      </div> */}
       <UpdateMediaModal
         isModalShow={isUpdateShow}
         setModalShow={setIsUpdateShow}
@@ -144,38 +149,64 @@ function MediaContent({
       />
       <div className="card-body">
         <Tabs defaultActiveKey="photo" transition={false} id="tab-media-content" onSelect={(key: any) => onChangeTab(key)}>
-          <Tab eventKey="photo" title={`Fotos (${totalPhoto})`}>
-            {loading && <Loading />}
-            {!loading && itemsPhoto.length > 0
-              ? (
-                <Row>
-                  {itemsPhoto.map((item: any, index: any) => (
-                    <Col xs={6} sm={6} md={6} lg={4} key={item._id + index as any} data-toggle="tooltip" title={item.name}>
-                      <div className="image-box mt-1 mb-1 active">
-                        <img alt="media_thumb_photo" src={item?.media?.thumbUrl || '/images/default_thumbnail_photo.jpg'} style={{ height: '100%' }} />
-                        <h5>
-                          <i className="far fa-eye" />
-                          {' '}
-                          Vorschau
-                        </h5>
-                        <a className="edit" onClick={() => handleOpenModalUpdate(item, 'photo')}>
-                          <i className="fas fa-pencil-alt" />
-                        </a>
-                        <a className="remove" onClick={() => handleRemove(item._id, 'photo')}>
-                          <i className="fas fa-trash" />
-                        </a>
-                        <a href="#" className="popup" role="button" onClick={() => handleOpenMedia(item)}>{}</a>
-                        <div className="overlay" />
-                      </div>
-                      <div className="media-name">
-                        {item.name}
-                      </div>
-                    </Col>
-                  ))}
-                </Row>
-              ) : <p className="text-alert-danger">Sie haben kein Foto verfügbar!</p>}
-            {itemsPhoto.length > 0 && totalPhoto > 0 && totalPhoto > take && <MainPaginate currentPage={pagePhoto} pageTotal={totalPhoto} pageNumber={take} setPage={setPagePhoto} />}
-          </Tab>
+        <Tab eventKey="photo" title={`Fotos (${totalPhoto})`}>
+  {loading && <Loading />}
+  {!loading && itemsPhoto?.length > 0 ? (
+    <Row className=''>
+      {photoFolders?.map((folder: any, index: any) => (
+        <article key={folder._id + index} style={{ width: selectedFolderId === folder._id ? '100%' : '30%' }}>
+          <section
+            onClick={() => handleFolderClick(folder._id)}
+            style={{ cursor: 'pointer', margin: '10px', border: selectedFolderId === folder._id ? '': '1px solid #eee', display: selectedFolderId && selectedFolderId !== folder._id ? 'none' : 'block' }}
+            className='image-box mt-1 mb-1 active'
+          >
+            { <img
+              style={{ display: selectedFolderId === folder._id ? 'none' : 'block',  objectFit: 'cover' }}
+              src={folder?.sellItems?.[0]?.media?.thumbUrl || '/images/default_thumbnail_photo.jpg'}
+              alt="media_thumb_photo"
+            />}
+            <button style={{ width: selectedFolderId === folder._id ? '20%' : '100%', height: '100%', backgroundColor: '#FF337C', color: 'white', border: 'none', padding: '10px' }} className=''>
+              {selectedFolderId === folder._id ? "Go back" : folder.name}
+            </button>
+          </section>
+
+          {selectedFolderId === folder?._id && (
+            <Row>
+              {folder?.sellItems?.map((item: any, index: any) => (
+                <Col xs={12} sm={6} md={4} lg={4} key={item._id + index} data-toggle="tooltip" title={item.name}>
+                  <div className="image-box mt-1 mb-1 active">
+                    <img
+                      alt="media_thumb_photo"
+                      src={item?.media?.thumbUrl || '/images/default_thumbnail_photo.jpg'}
+                    />
+                    <h5>
+                      <i className="far fa-eye" /> Vorschau
+                    </h5>
+                    <a className="edit" onClick={() => handleOpenModalUpdate(item, 'photo')}>
+                      <i className="fas fa-pencil-alt" />
+                    </a>
+                    <a className="remove" onClick={() => handleRemove(item._id, 'photo')}>
+                      <i className="fas fa-trash" />
+                    </a>
+                    <a href="#" className="popup" role="button" onClick={() => handleOpenMedia(item)}></a>
+                    <div className="overlay" />
+                  </div>
+                  <div className="media-name">
+                    {item.name}
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          )}
+        </article>
+      ))}
+    </Row>
+  ) : (
+    <p className="text-alert-danger">Sie haben kein Foto verfügbar!</p>
+  )}
+  {itemsPhoto.length > 0 && totalPhoto > 0 && totalPhoto > take && <MainPaginate currentPage={pagePhoto} pageTotal={totalPhoto} pageNumber={take} setPage={setPagePhoto} />}
+</Tab>
+
           <Tab eventKey="video" title={`Videos (${totalVideo})`}>
             {loading && <Loading />}
             {!loading && itemsVideo.length > 0
@@ -187,7 +218,7 @@ function MediaContent({
                         <img
                           alt="media_thumb_video"
                           className="thumb-video"
-                          src={item?.media?.thumbUrl || '/images/default_thumbnail_video.png'}
+                          src={item?.media?.originalPath || '/images/default_thumbnail_video.png'}
                         />
                         <h5>
                           <i className="far fa-eye" />

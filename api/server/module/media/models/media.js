@@ -120,5 +120,46 @@ schema.method('getPublic', function getPublic() {
 
   return data;
 });
+schema
+  .virtual('isPurchased')
+  .set(function setVal(val) {
+    this._isPurchased = val;
+  })
+  .get(function getVal() {
+    return this._isPurchased || false;
+  });
 
+schema
+  .virtual('purchasedItem')
+  .set(function setVal(val) {
+    this._purchasedItemId = val;
+  })
+  .get(function getVal() {
+    return this._purchasedItemId || null;
+  });
+
+  schema
+  .virtual('isFree')
+  .set(function setVal(val) {
+    this._isFreeId = val;
+  })
+  .get(function getVal() {
+    return this._isFreeId || false;
+  });
+  schema
+  .virtual('sellItemId')
+  .set(function setVal(val) {
+    this._sellItemId = val;
+  })
+  .get(function getVal() {
+    return this._sellItemId || null;
+  });
+  schema
+  .virtual('price')
+  .set(function setVal(val) {
+    this._price = val;
+  })
+  .get(function getVal() {
+    return this._price || null;
+  });
 module.exports = schema;

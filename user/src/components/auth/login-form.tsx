@@ -59,6 +59,8 @@ function LoginForm({
         Authorization: `Bearer ${token}`
       });
       dispatchSetLogin(me.data);
+      localStorage.setItem('userType', JSON.stringify(me.data?.type));
+      localStorage.setItem('userEmail', JSON.stringify(me.data?._id));
       if (!me?.data?.isCompletedProfile || !me?.data?.isApproved) {
         router.push('/profile/update?requireUpdate=1');
       } else {

@@ -1,15 +1,18 @@
 const Joi = require('joi');
 const _ = require('lodash');
+const Folder = require('../models/folder');
 
 exports.createSellItem = async (req, res, next) => {
   try {
     const schema = Joi.object().keys({
-      mediaId: Joi.string().required(),
-      price: Joi.number().min(0).required(),
-      free: Joi.boolean().required(),
-      name: Joi.string().min(2).max(500).required(),
-      description: Joi.string().required(),
-      mediaType: Joi.string().allow('photo', 'video').required()
+      mediaId: Joi.string().allow('', String).optional(),
+      price: Joi.number().min(0).allow('', null).optional(),
+      free: Joi.boolean().allow('', String).optional(),
+      name: Joi.string().min(2).max(500).allow('', String).optional(),
+      description: Joi.string().allow('', String).optional(),
+      mediaType: Joi.string().allow('photo', 'video').allow('', String).optional(),
+      folderId: Joi.string().required(),
+      isApproved: Joi.boolean().default(false),
     });
 
     const validate = schema.validate(req.body);
@@ -24,7 +27,11 @@ exports.createSellItem = async (req, res, next) => {
       return next(PopulateResponse.notFound());
     }
 
-    const sellItem = new DB.SellItem({ userId: req.user._id, ...validate.value });
+    const sellItem = new DB.SellItem({
+      userId: req.user._id,
+      folderId: validate.value.folderId,
+      ...validate.value
+    });
     await sellItem.save();
     res.locals.create = sellItem;
     return next();
@@ -32,6 +39,7 @@ exports.createSellItem = async (req, res, next) => {
     return next(error);
   }
 };
+
 
 exports.search = async (req, res, next) => {
   const page = Math.max(0, req.query.page - 1) || 0; // using a zero-based page index for use with skip()
@@ -77,7 +85,7 @@ exports.update = async (req, res, next) => {
       price: Joi.number().min(0).required(),
       free: Joi.boolean().required(),
       name: Joi.string().min(2).max(500).required(),
-      description: Joi.string().required(),
+      description: Joi.string().allow('', String).optional(),
       isApproved: Joi.boolean().optional()
     });
 
@@ -163,20 +171,40 @@ exports.mySellItem = async (req, res, next) => {
       return next(PopulateResponse.forbidden());
     }
 
-    const count = await DB.SellItem.count({ userId: req.user._id, mediaType: req.query.mediaType, isApproved: true });
-    const items = await DB.SellItem.find({ userId: req.user._id, mediaType: req.query.mediaType, isApproved: true })
-      .populate('media')
-      .sort({ createdAt: -1 })
-      .skip(page * take)
-      .limit(take)
-      .exec();
+    // Fetch folders for the user
+    const folders = await Folder.find({ userId: req.user._id }).exec();
 
-    res.locals.mySellItem = { count, items };
+    // Fetch SellItems and associated media for each folder
+    const foldersWithItems = await Promise.all(
+      folders.map(async (folder) => {
+        const sellItems = await DB.SellItem.find({
+          folderId: folder._id,
+          mediaType: req.query.mediaType,
+          isApproved: true
+        }).populate('media').sort({ createdAt: -1 }).skip(page * take).limit(take).exec();
+
+        return {
+          ...folder.toObject(),
+          sellItems,
+        };
+      })
+    );
+
+    // Flatten sell items to compute the count
+    const allSellItems = foldersWithItems.flatMap(folder => folder.sellItems);
+    const count = allSellItems.length;
+
+    // Response structure
+    res.locals.mySellItem = {
+      count,
+      folders: foldersWithItems,
+    };
     return next();
   } catch (e) {
     return next(e);
   }
 };
+
 
 exports.modelSellItem = async (req, res, next) => {
   const page = Math.max(0, req.query.page - 1) || 0; // using a zero-based page index for use with skip()
@@ -192,7 +220,7 @@ exports.modelSellItem = async (req, res, next) => {
       isApproved: true
     });
     const items = await DB.SellItem.find({
-      userId: req.query.modelId,
+      ownerId: req.query.modelId,
       mediaType: req.query.mediaType,
       isApproved: true
     })
@@ -228,5 +256,167 @@ exports.modelSellItem = async (req, res, next) => {
   } catch (e) {
     console.log(e);
     return next(e);
+  }
+};
+
+
+exports.modelSellItems = async (req, res, next) => {
+  const page = Math.max(0, req.query.page - 1) || 0; // using a zero-based page index for use with skip()
+  const take = parseInt(req.query.take, 10) || 10;
+  console.log(req.query.modelId, "idissssssssssss");
+  try {
+    // Retrieve folders for the specified model
+    const folders = await Folder.find({ userId: '6683cce9a5e475a6ac5c0731' || req.query.modelId });
+    console.log(folders, "folders");
+
+    // Get count of sell items that are approved
+    const count = await DB.SellItem.count({
+      userId: '6683cce9a5e475a6ac5c0731' || req.query.modelId,
+      mediaType: req.query.mediaType,
+      isApproved: true
+    });
+
+    // Initialize variables to store results
+    let totalPhotoCount = 0;
+    let totalVideoCount = 0;
+    let photos = [];
+    let videos = [];
+
+    const foldersWithImages = await Promise.all(
+      folders.map(async (folder) => {
+        // Retrieve sell items for each folder
+        const sellItems = await DB.SellItem.find({
+          folderId: folder._id,
+          mediaType: req.query.mediaType,
+          isApproved: true
+        }).populate('media').sort({ createdAt: -1 }).skip(page * take).limit(take).exec();
+
+        const photoItems = sellItems.filter(item => item.mediaType === 'photo');
+        const videoItems = sellItems.filter(item => item.mediaType === 'video');
+
+        photos = [...photos, ...photoItems];
+        videos = [...videos, ...videoItems];
+
+        totalPhotoCount += photoItems.length;
+        totalVideoCount += videoItems.length;
+
+        // Find and populate purchase item data for each sell item
+        const sellItemIds = sellItems.map(item => item._id);
+        const purchaseItems = await DB.PurchaseItem.find({
+          userId: req.user._id,
+          sellItemId: {
+            $in: sellItemIds
+          }
+        });
+
+        const data = sellItems.map(item => {
+          item.set('isPurchased', purchaseItems.some(p => p.sellItemId.toString() === item._id.toString()));
+          item.set('purchasedItem', purchaseItems.find(p => p.sellItemId.toString() === item._id.toString()));
+
+          return item;
+        });
+
+        return {
+          ...folder.toObject(),
+          sellItems: data,
+        };
+      })
+    );
+
+    res.locals.modelSellItem = {
+      count,
+      folders: foldersWithImages,
+      totalPhotoCount,
+      totalVideoCount
+    };
+    return next();
+  } catch (e) {
+    console.log(e);
+    return next(e);
+  }
+};
+
+
+
+
+// blogs posts 
+exports.createBlogPost = async (req, res, next) => {
+  try {
+    const schema = Joi.object().keys({
+      mediaId: Joi.string().allow('', String).optional(),
+      name: Joi.string().min(2).max(500).allow('', String).optional(),
+      description: Joi.string().allow('', String).optional(),
+      mediaType: Joi.string().allow('photo', 'video').allow('', String).optional(),
+      type: Joi.string().allow('blog', 'post').allow('', String).optional(),
+    });
+
+    const validate = schema.validate(req.body);
+    if (validate.error) {
+      return next(PopulateResponse.validationError(validate.error));
+    }
+    if (req.user.type !== 'model') {
+      return next(PopulateResponse.forbidden());
+    }
+    const media = await DB.Media.findOne({ _id: validate.value.mediaId });
+    if (!media) {
+      return next(PopulateResponse.notFound());
+    }
+
+    const blogItem = new DB.SellItem({
+      userId: req.user._id,
+      type: "blog",
+      ...validate.value
+    });
+    await blogItem.save();
+    res.locals.create = blogItem;
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.getAllBlogs = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      return next(PopulateResponse.validationError({ message: 'User ID is required' }));
+    }
+    const blogs = await DB.SellItem.find({ userId, type: "blog" }).populate('media')
+    if (!blogs.length) {
+      return next(PopulateResponse.notFound());
+    }
+    res.json({
+      code: 200,
+      message: 'OK',
+      data: blogs
+    });  
+      return next();
+  } catch (error) {
+    return next(error);
+  }
+};
+
+
+exports.getBlogById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return next(PopulateResponse.validationError({ message: 'Blog ID is required' }));
+    }
+
+    const blog = await DB.SellItem.findById(id).populate('media');
+    if (!blog) {
+      return next(PopulateResponse.notFound());
+    }
+
+    res.json({
+      code: 200,
+      message: 'OK',
+      data: blog
+    }); 
+    return next();
+  } catch (error) {
+    return next(error);
   }
 };

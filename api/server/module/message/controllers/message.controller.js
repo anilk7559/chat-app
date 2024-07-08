@@ -12,6 +12,7 @@ exports.create = async (req, res, next) => {
       fileIds: Joi.array().allow(null).optional(),
       conversationId: Joi.string().required(),
       type: Joi.string().allow('text', 'photo', 'video', 'file').required(),
+      price: Joi.number().min(0).optional(), // Add price validation
       socketId: Joi.string().allow(null, '').optional()
     });
     const validate = validateSchema.validate(req.body);
@@ -49,15 +50,16 @@ exports.create = async (req, res, next) => {
       return next(PopulateResponse.notFound({ message: 'Recipient is not found' }));
     }
     if (!recipient.isActive) {
-      return next(PopulateResponse.error({ message: 'Cannot send message, this profile has been deactive!' }));
+      return next(PopulateResponse.error({ message: 'Cannot send message, this profile has been deactivated!' }));
     }
 
-    // check user token is available when user send message to model
+    // check user token is available when user sends message to model
     if (recipient.type === 'model' && recipient?.tokenPerMessage > req.user?.balance) {
       return next(PopulateResponse.error({ message: 'Token is not enough' }));
     }
 
-    const message = new DB.Message(Object.assign(validate.value, { senderId: req.user._id, recipientId }));
+    const messageData = Object.assign(validate.value, { senderId: req.user._id, recipientId });
+    const message = new DB.Message(messageData);
     await message.save();
 
     // Populate media data
@@ -68,13 +70,13 @@ exports.create = async (req, res, next) => {
       }
     }
 
-    // emit socket event and update conversation last message data
+    // Emit socket event and update conversation last message data
     Queue.notifyAndUpdateRelationData(message, { socketId: validate.value?.socketId || null });
 
-    // update conversation meta data for request user
+    // Update conversation meta data for request user
     await Service.Message.readMessage({ conversationId: validate.value.conversationId, userId: req.user._id });
 
-    // update earning data
+    // Update earning data
     const EarningData = { type: 'send_message' };
     if (req.user.type === 'user') {
       await Service.Earning.create(
@@ -83,7 +85,7 @@ exports.create = async (req, res, next) => {
           modelId: _.find(conversation.memberIds, (member) => member.toString() !== req.user._id.toString()),
           itemId: message._id
         }),
-        // do not charge user until model replied
+        // Do not charge user until model replied
         'pending'
       );
     } else {
@@ -100,6 +102,7 @@ exports.create = async (req, res, next) => {
     return next(e);
   }
 };
+
 
 /**
  * get list message by conversation id
@@ -125,7 +128,30 @@ exports.search = async (req, res, next) => {
       messageId: { $in: messageIds },
       userId: req.user._id
     });
-
+    const updateFiles = async () => {
+      for (const item of items) {
+        for (const file of item.files) {
+          const purchaseExists = await DB.PurchaseItem.exists({ mediaId: file._id });
+    
+          const sellItemExists = await DB.SellItem.findOne({ mediaId: file._id, folderId: file._id });
+          if (!sellItemExists) {
+            file.isFree = true; // Set isFree to true if no SellItem exists
+          } else {
+            file.isFree = false; // Set isFree to false if SellItem exists
+            file.sellItemId = sellItemExists._id; // Assign sellItemId if SellItem exists
+            file.price = sellItemExists.price; 
+          }
+    
+          file.isPurchased = !!purchaseExists;
+          file.purchasedItem = null;
+    
+          await file.save();
+        }
+      }
+    };
+    
+    await updateFiles();
+    
     res.locals.search = {
       count,
       items: items.map((item) => {

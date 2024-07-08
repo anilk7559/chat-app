@@ -14,6 +14,7 @@ class MediaService extends APIRequest {
     })
       .then((response) => {
         if (response.status >= 200 && response.status < 300) {
+          
           return response;
         }
         throw response.clone().json();
@@ -21,7 +22,8 @@ class MediaService extends APIRequest {
       .then((response) => {
         if (response.status === 204 || response.status === 205) {
           return null;
-        }
+          }
+        console.log(response, 'response message');
         return response.json();
       });
   }

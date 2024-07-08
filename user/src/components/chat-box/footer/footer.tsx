@@ -2,11 +2,11 @@ import * as Yup from 'yup';
 import SendFile from './send-file';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import { useEffect, useState } from 'react';
-import { Button, FormControl } from 'react-bootstrap';
+import { Button, Form, FormControl, Modal } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import { sendMessage } from 'src/redux/message/actions';
-import { mediaService } from 'src/services';
+import { mediaService, sellItemService } from 'src/services';
 
 interface IProps {
   selectedConversation: any;
@@ -35,6 +35,15 @@ function ChatFooter({
   const [sendFileBox, openSendFileBox] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const [placeHolder, setPlaceHolder] = useState('Bitte geben Sie Ihre Nachricht hier ein...');
+  const [showDialog, setShowDialog] = useState(false);
+  const [price, setPrice] = useState(0);
+  const [isFree, setIsFree] = useState(true);
+  const [userType, setUserType] = useState('');
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('userType'));
+    setUserType(user);
+  }, []);
 
   useEffect(() => {
     // Anything in here is fired on component mount.
@@ -81,9 +90,15 @@ function ChatFooter({
     }
   }, [selectedConversation, haveBeenBlockStatus, blockConvStore, unBlockConvStore]);
 
+  const closeMedia = () => {
+    setShowDialog(false);
+  }
   const handleSendMedia = async (dataFiles: any) => {
     if (dataFiles && dataFiles.length > 3) {
       return toast.error('Kann nicht mehr als 3 Medien auf einmal senden');
+    } 
+    if (userType === 'model' && !isFree && price <= 0) {
+      return toast.error('Please enter a price greater than 0.');
     }
     return Promise.all(
       dataFiles.map((file) => {
@@ -106,8 +121,17 @@ function ChatFooter({
         conversationId: selectedConversation._id
         // socketId: socket.status === 'connected' ? socket.id : null
       };
+      console.log(data, "conversation");
       sendMess(data);
+      closeMedia()
       openSendFileBox(false);
+      if(userType === 'model') {
+        const sellMedia = sellItemService.createSellItem({
+          mediaId: fileIds?.[0], folderId: fileIds?.[0],
+          description: "chat_image", price: price ? price : 0,
+          mediaType: "photo", name: "chat_image", isApproved: true
+        });
+      }
     });
   };
   const handleSendFile = async (files: any) => {
@@ -182,7 +206,64 @@ function ChatFooter({
                   : {}
               }
             >
-              <SendFile onDrop={handleSendMedia} type="media" />
+          {showDialog && <Modal
+            dialogClassName="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-dialog-zoom mw-80"
+            aria-labelledby="contained-modal-title-vcenter"
+            className="modal modal-lg-fullscreen fade modal-uploader model-content-image"
+            show={showDialog}
+            onHide={() => closeMedia()}
+          >
+            <Modal.Header>
+              <Modal.Title className="text-align-start media-name" data-toggle="tooltip" title={'Upload media'}>{'Upload media'}</Modal.Title>
+              <Button className="fa fa-xmark" type="button" aria-label="Close" onClick={() => closeMedia()} />
+            </Modal.Header>
+            <Modal.Body className=" my-0 mx-auto">
+                    <SendFile onDrop={handleSendMedia} type="media" /> <hr />
+                    <div style={{width: '100%'}} className="row mt-2">
+                    <Modal.Body>
+                    <Form.Check
+                      type="checkbox"
+                      label="Is Free"
+                      checked={isFree}
+                      onChange={(e) => {
+                        setIsFree(e.target.checked);
+                        if (e.target.checked) {
+                          setPrice(0); // Reset price to 0 if checkbox is checked
+                        }
+                      }}
+                    />
+                    <Form.Control
+                      type="number"
+                      placeholder="Enter price"
+                      value={price}
+                      disabled={isFree} // Disable if isFree is true
+                      onChange={(e) => setPrice(parseFloat(e.target.value))}
+                    />
+                    <p></p>
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        key="button-upload"
+                        disabled={!price && isFree}
+                        onClick={closeMedia}
+                      >
+                        Upload
+                      </Button>
+                    </Modal.Body>
+                          </div>
+            </Modal.Body>
+          </Modal>}
+        {userType === 'model'?  <div style={{cursor: 'pointer'}} onClick={()=> setShowDialog(true)} className="row ml-4">
+         <svg className="hw-20 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+          <span> Gallery </span>
+         </div> : <SendFile onDrop={handleSendMedia} type="media" />}
               <SendFile onDrop={handleSendFile} type="file" />
             </div>
           </div>

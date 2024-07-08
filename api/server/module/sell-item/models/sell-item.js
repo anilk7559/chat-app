@@ -6,13 +6,18 @@ const schema = new Schema(
     mediaId: {
       type: Schema.Types.ObjectId,
       ref: 'Media',
-      index: true
+      index: true,
     },
     userId: {
       // modelId / ownerId
       type: Schema.Types.ObjectId,
       ref: 'User',
       index: true
+    },
+    folderId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Folder',
+      index: true,
     },
     name: {
       type: String,
@@ -25,6 +30,9 @@ const schema = new Schema(
     price: {
       type: Number,
       default: 0
+    },
+    type: {
+      type: String,
     },
     free: {
       type: Boolean,
@@ -60,6 +68,13 @@ const schema = new Schema(
     }
   }
 );
+
+schema.virtual('folder', {
+  ref: 'Folder',
+  localField: 'folderId',
+  foreignField: '_id',
+  justOne: true,
+});
 
 schema.virtual('media', {
   ref: 'Media',

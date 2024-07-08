@@ -24,6 +24,7 @@
     "md5": "^2.3.0",
     "method-override": "^3.0.0",
     "migrate": "^1.8.0",
+    "migrate-mongo": "^11.0.0",
     "mkdirp": "^1.0.4",
     "moment": "^2.29.4",
     "mongodb": "^4.12.1",

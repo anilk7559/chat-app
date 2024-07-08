@@ -5,7 +5,7 @@ import {
 } from 'formik';
 import getConfig from 'next/config';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Form, FormControl } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import Upload from 'src/components/upload/Upload';
@@ -17,6 +17,7 @@ interface FormValues {
   price: string;
   mediaType: string;
   free: boolean;
+  // folderName: string;
 }
 
 const schema = Yup.object().shape({
@@ -27,17 +28,43 @@ const schema = Yup.object().shape({
   price: Yup.number().min(0).required('Price is Required'),
   description: Yup.string().required('Description is Required'),
   mediaType: Yup.string().required('Type is Required'),
-  free: Yup.boolean().required()
+  free: Yup.boolean().required(),
+  // folderName: Yup.string().required('Folder Name is Required'),
 });
 
 function FormMedia() {
   const [fileUpload, setFileUpload] = useState(null);
+  const [isChecked, setIsChecked] = useState(false);
+  const API_SERVER_ENDPOINT: string = 'http://localhost:8080/v1';
   const { publicRuntimeConfig: config } = getConfig();
   const [mediaId, setMediaId] = useState('');
-  const [url, setUrl] = useState(`${config.API_ENDPOINT}/media/photos`);
+  // const [url, setUrl] = useState(`${config.API_ENDPOINT}/media/photos`); // used (`${config.API_ENDPOINT}/media/photos`) changed to process.env.API_SERVER_ENDPOINT
+  const [url, setUrl] = useState(`${API_SERVER_ENDPOINT}/media/photos`);
   const [switchValue, setSwitchValue] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const router = useRouter();
+  const [folders, setFolders] = useState([]);
+  const [selectedFolder, setSelectedFolder] = useState('');
+  const [newFolderName, setNewFolderName] = useState('');  
+
+
+  useEffect(() => {
+    const fetchFolders = async () => {
+      const response = await sellItemService.getFolders();
+      console.log(response, "fetch folders");
+      
+      setFolders(response?.folders);
+    };
+    fetchFolders();
+  }, []);
+
+  const createFolder = async () => {
+    const response = await sellItemService.createFolder({ name: newFolderName });
+    console.log(response, "create folder");
+    
+    setFolders([...folders, response?.data?.folder]);
+    setNewFolderName('');
+  };
 
   const onChangeType = (type: any, props: FormikProps<FormValues>) => {
     props.setFieldValue('mediaType', type.currentTarget.value);
@@ -46,7 +73,7 @@ function FormMedia() {
     props.setFieldValue('price', '0');
     props.setFieldValue('free', false);
     setFileUpload(null);
-    setUrl(`${config.API_ENDPOINT}/media/${type.currentTarget.value}s`);
+    setUrl(`${API_SERVER_ENDPOINT}/media/${type.currentTarget.value}s`);
   };
 
   const onCheck = (e: any, props: FormikProps<FormValues>) => {
@@ -63,12 +90,23 @@ function FormMedia() {
     setFileUpload(resp);
   };
 
+    const handleCheckboxChange = () => {
+    setIsChecked(!isChecked);
+  };
   const upload = async (formValues) => {
+    if (!isChecked) {
+      toast.error('Bitte wählen Sie das Kontrollkästchen, um fortzufahren.');
+      return;
+    }
+    if(!selectedFolder){
+      toast.error('Bitte wählen Sie einen Ordner aus.');
+      return;
+    }
     try {
       setDisabled(true);
       await sellItemService.createSellItem({
         ...formValues,
-        mediaId
+        mediaId, folderId: selectedFolder
       });
       toast.success('Medieninhalt wurde erfolgreich hochgeladen. Bitte warten Sie auf die Genehmigung durch den Administrator.');
       setTimeout(() => router.push('/profile/media-content'), 3000);
@@ -98,7 +136,7 @@ function FormMedia() {
               description: '',
               price: '0',
               mediaType: 'photo',
-              free: false
+              free: false,
             }}
           >
             {(props: FormikProps<FormValues>) => (
@@ -120,8 +158,49 @@ function FormMedia() {
                         </Field>
                       </Form.Group>
                     </div>
+                     <div className="col-md-6 col-12">
+                      <Form.Group>
+                        <Form.Label>Ordnername</Form.Label>
+                        <FormControl
+                          type="text"
+                          name="name"
+                          id="name"
+                          className="form-control form-control-md"
+                          placeholder="Bitte geben Sie den Namen ein."
+                          onChange={(e) => setNewFolderName(e.target.value)}
+                          value={newFolderName}
+                        />
+                        <div className="invalid-feedback">
+                          {props.errors.name}
+                        </div>
+                    <Button
+                    type="submit"
+                    variant="primary"
+                    key="button-upload"
+                    disabled={!fileUpload || disabled}
+                    onClick={createFolder}>
+                    Ordner erstellen
+                  </Button>
+                      </Form.Group>
+                    </div>
+              <div >
+              <Form.Group>
+                        <Form.Label>Ordner auswählen</Form.Label>
+                        <Field
+                          className="form-control form-control-md"
+                          name="mediaType"
+                          component="select"
+                          value={selectedFolder} onChange={(e) => setSelectedFolder(e.target.value)}
+                        >
+                          <option value="">Select Folder</option>
+                      {folders?.map((folder) => (
+                        <option key={folder?._id} value={folder?._id}>{folder?.name}</option>
+                      ))}
+                        </Field>
+                      </Form.Group>
+                    </div>
 
-                    <div className="col-12">
+                    <div className="col-12 mt-4">
                       <Form.Group>
                         <div className=" custom-control custom-switch">
                           <input
@@ -213,6 +292,7 @@ function FormMedia() {
                       <Upload
                         key="upload"
                         url={url}
+                        isChecked={isChecked}
                         onComplete={onCompleteFile}
                         onRemove={() => setFileUpload(null)}
                         config={{
@@ -226,7 +306,12 @@ function FormMedia() {
                     </div>
                   </div>
                 </div>
-                <div className="card-footer d-flex justify-content-end">
+                <div className="card-footer d-flex justify-content-between">
+                <div style={{ display: 'flex' , alignItems: 'center'}} className="flex">
+                  <input style={{marginTop: '-9px'}} checked={isChecked}
+                  onChange={handleCheckboxChange} className='' type="checkbox" name="confirm" id="confirm" />
+                  <p className='ml-2 mt-1'>Ich akzeptiere</p>
+                </div>
                   <Button
                     type="submit"
                     variant="primary"
@@ -238,6 +323,7 @@ function FormMedia() {
                 </div>
               </form>
             )}
+            
           </Formik>
         </div>
       </div>

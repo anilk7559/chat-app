@@ -1,4 +1,5 @@
 const sellItemController = require('../controllers/sell-item.controller');
+const folderController = require('../controllers/folder.controller');
 
 module.exports = (router) => {
   /**
@@ -16,6 +17,8 @@ module.exports = (router) => {
     Middleware.Response.success('create')
   );
 
+
+ 
   /**
    * @apiGroup Sell Item
    * @apiVersion 1.0.0
@@ -46,6 +49,12 @@ module.exports = (router) => {
     Middleware.Response.success('modelSellItem')
   );
 
+  router.get(
+    '/v1/sell-items/model',
+    Middleware.isAuthenticated,
+    sellItemController.modelSellItems,
+    Middleware.Response.success('modelSellItem')
+  );
   /**
    * @apiGroup Sell Item
    * @apiVersion 1.0.0
@@ -108,4 +117,53 @@ module.exports = (router) => {
     sellItemController.remove,
     Middleware.Response.success('remove')
   );
+
+
+  // folder routes
+
+  router.post(
+    '/v1/create-folder',
+    Middleware.isAuthenticated,
+    folderController.createFolder,
+    Middleware.Response.success('create')
+  );
+
+  // get folder route
+  router.get(
+    '/v1/folders',
+    Middleware.isAuthenticated,
+    folderController.getFolders,
+    Middleware.Response.success('folders')
+  );
+
+
+  router.get(
+    '/v1/folder-images',
+    Middleware.isAuthenticated,
+    folderController.getFoldersWithImages,
+    Middleware.Response.success('folderswith images')
+  );
+
+   // create blogs posts
+ router.post(
+  '/v1/blog-post',
+  Middleware.isAuthenticated,
+  sellItemController.createBlogPost,
+  Middleware.Response.success('create')
+);
+
+
+router.get(
+  '/v1/blogs/:userId',
+  Middleware.isAuthenticated,
+  sellItemController.getAllBlogs,
+  Middleware.Response.success('getAllBlogs')
+);
+
+router.get(
+  '/v1/getBlogPost/:id',
+  Middleware.isAuthenticated,
+  sellItemController.getBlogById,
+  Middleware.Response.success('getBlogById')
+);
 };

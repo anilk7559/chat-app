@@ -105,7 +105,7 @@ const SellItemDetail: React.FunctionComponent<IProps> = ({ data, submit, loading
             <Col md={6}>
               <FormGroup>
                 <Label>Model</Label>
-                <Input type="text" name="modelName" id="modelName" defaultValue={model.username || 'No name'} />
+                <Input type="text" name="modelName" id="modelName" defaultValue={model?.username || 'No name'} />
               </FormGroup>
             </Col>
             <Col md={6}>

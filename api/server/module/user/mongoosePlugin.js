@@ -63,7 +63,7 @@ exports.User = (schema) => {
     },
     balance: {
       type: Number,
-      default: 0
+      default: 10
     },
     isOnline: {
       type: Boolean,

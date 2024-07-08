@@ -15,6 +15,7 @@ function MediaContentPage({ authUser }: IProps) {
   const [isOpenMedia, setIsOpenMedia] = useState(false);
   const [mediaItem, setMediaItem] = useState(null);
   const [titleModal, setTitleModal] = useState('');
+  const [folderImages, setFolderImages] = useState([]);
 
   const openMedia = (item: any) => {
     setIsOpenMedia(true);
