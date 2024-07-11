@@ -91,6 +91,7 @@ function ContactFooter({
       toast.error('Es tut uns leid. Nur Benutzer können Premium-Inhalte erwerben.');
     } else if (window.confirm('Sind Sie sicher, dass Sie dieses Element kaufen möchten?')) {
       dispatch(purchaseItem({ sellItemId: item._id }));
+      loadSellItems();
     }
   };
   const handleView = async (e, item: any) => {
@@ -171,9 +172,9 @@ function ContactFooter({
                           </a>
                           <div className="overlay" />
                         </div>
-                        <div className="media-name" data-toggle="tooltip" data-placement="top" title={item.name}>
+                        {/* <div className="media-name" data-toggle="tooltip" data-placement="top" title={item.name}>
                           {item.name}
-                        </div>
+                        </div> */}
                       </Col>
                     ))
                   ) : (

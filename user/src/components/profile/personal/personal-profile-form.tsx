@@ -155,7 +155,7 @@ class PersonalProfileForm extends Component<any, any> {
                       </Form.Group>
                     </Col>
                     <p className='text-muted mx-auto'>Diese Daten werden nicht im Profil angezeigt</p>
-                    <Col md={6} xs={12}>
+                    <Col md={12} xs={12}>
                       <Form.Group>
                         <Form.Label>E-Mail Adresse</Form.Label>
                         <FormControl
@@ -171,7 +171,7 @@ class PersonalProfileForm extends Component<any, any> {
                         <div className="invalid-feedback">{props.errors.email}</div>
                       </Form.Group>
                     </Col>
-                    <Col md={6} xs={12}>
+                    {/* <Col md={6} xs={12}>
                       <Form.Group>
                         <Form.Label>Telefonnummer</Form.Label>
                         <FormControl
@@ -187,7 +187,7 @@ class PersonalProfileForm extends Component<any, any> {
                         />
                         <div className="invalid-feedback">{props.errors.phoneNumber}</div>
                       </Form.Group>
-                    </Col>
+                    </Col> */}
                     <Col xs={12} md={6}>
                       <Form.Group>
                         <Form.Label>
@@ -268,7 +268,7 @@ class PersonalProfileForm extends Component<any, any> {
                         <div className="invalid-feedback">{props.errors.bio}</div>
                       </Form.Group>
                     </Col>
-                    <Col xs={12}>
+                    {/* <Col xs={12}>
                       <Form.Group>
                         <Form.Label>Adresse</Form.Label>
                         <FormControl
@@ -299,7 +299,7 @@ class PersonalProfileForm extends Component<any, any> {
                         />
                         <div className="invalid-feedback">{props.errors.postCode}</div>
                       </Form.Group>
-                    </Col>
+                    </Col> */}
                     <Col xs={4}>
                       <Form.Group>
                         <Form.Label>Land</Form.Label>

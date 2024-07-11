@@ -45,9 +45,19 @@ exports.list = async (req, res, next) => {
       .skip(page * take)
       .limit(take)
       .exec();
+     
+      
+          // Aggregation to calculate total earnings
+    const totalEarningsResult = await DB.Earning.aggregate([
+      { $match: { modelId: req.user._id } },
+      { $group: { _id: null, totalBalance: { $sum: "$balance" } } }
+    ]);
+
+    const totalEarnings = totalEarningsResult.length > 0 ? totalEarningsResult[0].totalBalance : 0;
 
     res.locals.list = {
       count,
+      totalEarnings,
       // todo - update it
       items: items.map((item) => {
         const data = item.toObject();

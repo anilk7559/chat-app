@@ -11,7 +11,7 @@ import { Button, Col, Row } from 'react-bootstrap';
 
 function Blogs() {
     const {id} = useRouter().query;
-    const { publicRuntimeConfig: config } = getConfig();
+    // const { publicRuntimeConfig: config } = getConfig();
     const [blogPosts, setBlogPosts] = useState(null);  
     const fetchAllBlogs = async () => {
         try {
@@ -25,10 +25,6 @@ function Blogs() {
       useEffect(() => {
         fetchAllBlogs();
       }, []);
-
-      console.log('====================================');
-      console.log(blogPosts, "blogPosts");
-      console.log('====================================');
   
     return (
       <div style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'start', position: 'relative' }} className='m-4'>

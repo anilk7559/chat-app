@@ -78,7 +78,7 @@ function UserMenu({
               </a>
             </Dropdown.Item>
             <Dropdown.Item
-          onClick={() => onClickMenu('blogs/allblogs', 'blogs/allblogs')}
+          onClick={() => onClickMenu('/blogs/allblogs', '/blogs/allblogs')}
           active={activeRoute === '/blogs/allblogs'}
         >
          Blog Posts

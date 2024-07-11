@@ -31,7 +31,7 @@ function Blogs() {
   const [fileUpload, setFileUpload] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
   const API_SERVER_ENDPOINT: string = 'http://localhost:8080/v1';
-  const { publicRuntimeConfig: config } = getConfig();
+  // const { publicRuntimeConfig: config } = getConfig();
   const [mediaId, setMediaId] = useState('');
   const [url, setUrl] = useState(`${API_SERVER_ENDPOINT}/media/photos`);
   const [disabled, setDisabled] = useState(false);

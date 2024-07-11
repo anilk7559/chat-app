@@ -70,6 +70,14 @@ module.exports = (router) => {
     Middleware.Response.success('mySellItem')
   );
 
+
+  router.get(
+    '/v1/pending-item/me',
+    Middleware.isAuthenticated,
+    sellItemController.myPendingItem,
+    Middleware.Response.success('myPendingItem')
+  );
+
   /**
    * @apiGroup Sell Item
    * @apiVersion 1.0.0

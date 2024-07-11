@@ -19,11 +19,13 @@ function EarningHistoryPage() {
   const [query, setQuery] = useState(initialQuery);
   const [items, setItems] = useState({} as any);
   const [total, setTotal] = useState(0);
+  const [totalEarnings, setTotalEarnings] = useState(0);
 
   const loadEarning = async () => {
     try {
       const resp = await earningService.find(query);
       setItems(resp.data.items);
+      setTotalEarnings(resp.data.totalEarnings);
       setTotal(resp.data.count);
     } catch (e) {
       const error = await e;
@@ -79,6 +81,7 @@ function EarningHistoryPage() {
             <EarningHistory
               items={items}
               total={total}
+              totalEarnings={totalEarnings}
               handleGetEarning={handleGetEarning.bind(this)}
               {...query}
             />

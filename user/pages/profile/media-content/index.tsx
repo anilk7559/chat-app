@@ -40,7 +40,7 @@ function MediaContentPage({ authUser }: IProps) {
             </div>
           </div>
           <Row>
-            <Col md={12} className="flex justify-content-end mb-2">
+          <Col md={12} className="flex justify-content-end mb-2">
               <Button onClick={() => Router.push('/profile/upload', '/profile/upload', { shallow: true })} className="btn btn-primary">
               Medien hochladen
               </Button>

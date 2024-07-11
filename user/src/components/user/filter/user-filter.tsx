@@ -16,6 +16,8 @@ function UserFilter({ onFilter, showLocation = true }: IProps) {
     "02070", "02071", "02072", "02073", "02074", "02075", "02076", "02077", "02078", "02079",
   ];
 
+
+
   return (
     <>
       <div className="dropdown mr-2">
@@ -29,7 +31,7 @@ function UserFilter({ onFilter, showLocation = true }: IProps) {
       <div className="dropdown mr-2">
         <select className="btn btn-outline-default dropdown-toggle" onChange={(e) => onFilter(e.target.value)}>
           <option value="">Postleitzahl</option>
-          {germanPostalCodes?.map((i) => <option key={i} value={i}>{i}</option>)}
+          {germanPostalCodes?.map((i) => <option key={i} value={i}>{i.slice(0, 2)}xxxx</option>)}
         </select>
       </div>
       <div className="dropdown mr-2">

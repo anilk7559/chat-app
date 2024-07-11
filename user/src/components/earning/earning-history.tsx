@@ -14,6 +14,7 @@ interface IProps {
   take: number;
   sort: string;
   sortType: string;
+  totalEarnings: number
   // --- end ---
 }
 
@@ -31,7 +32,8 @@ function EarningHistory({
   page,
   take,
   sort,
-  sortType
+  sortType,
+  totalEarnings
 }: IProps) {
   const columns = [
     { name: 'Name', value: 'name' },
@@ -42,7 +44,6 @@ function EarningHistory({
     { name: 'Status', value: 'status' },
     { name: 'Erstellt am', value: 'createdAt' }
   ];
-  const totalBalance = items?.reduce((acc, item) => acc + (item.balance || 0), 0);
 
   return (
     <>
@@ -113,7 +114,7 @@ function EarningHistory({
       </aside>
       <section style={{marginTop: '1vw'}}>
         <span>Gesamteinnahmen</span> <br />
-        <span style={{marginLeft: '4vw'}}>{totalBalance.toFixed(2)}</span>
+        <span style={{marginLeft: '4vw'}}>{totalEarnings}</span>
       </section>
       </article>
       

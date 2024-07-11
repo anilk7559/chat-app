@@ -125,7 +125,7 @@ function ChatFooter({
       sendMess(data);
       closeMedia()
       openSendFileBox(false);
-      if(userType === 'model') {
+      if(userType === 'model' && price > 0) {
         const sellMedia = sellItemService.createSellItem({
           mediaId: fileIds?.[0], folderId: fileIds?.[0],
           description: "chat_image", price: price ? price : 0,

@@ -29,6 +29,9 @@ class SellItemService extends APIRequest {
   getMySellItem(data: IGetSellItem) {
     return this.get('/sell-item/me', data as any);
   }
+  getMyPendingItem(data: IGetSellItem) {
+    return this.get('/pending-item/me', data as any);
+  }
 
   updateSellItem(id: string, data: any) {
     return this.put(`/sell-item/${id}`, data);

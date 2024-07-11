@@ -205,6 +205,47 @@ exports.mySellItem = async (req, res, next) => {
   }
 };
 
+exports.myPendingItem = async (req, res, next) => {
+  const page = Math.max(0, req.query.page - 1) || 0; // using a zero-based page index for use with skip()
+  const take = parseInt(req.query.take, 10) || 10;
+  try {
+    if (req.user.type !== 'model') {
+      return next(PopulateResponse.forbidden());
+    }
+
+    // Fetch folders for the user
+    const folders = await Folder.find({ userId: req.user._id }).exec();
+
+    // Fetch SellItems and associated media for each folder
+    const foldersWithItems = await Promise.all(
+      folders.map(async (folder) => {
+        const sellItems = await DB.SellItem.find({
+          folderId: folder._id,
+          mediaType: req.query.mediaType,
+          isApproved: false
+        }).populate('media').sort({ createdAt: -1 }).skip(page * take).limit(take).exec();
+
+        return {
+          ...folder.toObject(),
+          sellItems,
+        };
+      })
+    );
+
+    // Flatten sell items to compute the count
+    const allSellItems = foldersWithItems.flatMap(folder => folder.sellItems);
+    const count = allSellItems.length;
+   console.log(foldersWithItems, "images");
+    // Response structure
+    res.locals.myPendingItem = {
+      count,
+      folders: foldersWithItems,
+    };
+    return next();
+  } catch (e) {
+    return next(e);
+  }
+};
 
 exports.modelSellItem = async (req, res, next) => {
   const page = Math.max(0, req.query.page - 1) || 0; // using a zero-based page index for use with skip()
@@ -368,7 +409,7 @@ exports.createBlogPost = async (req, res, next) => {
       ...validate.value
     });
     await blogItem.save();
-    res.locals.create = blogItem;
+    res.locals.createBlogPost = blogItem;
     return next();
   } catch (error) {
     return next(error);
@@ -381,7 +422,7 @@ exports.getAllBlogs = async (req, res, next) => {
     if (!userId) {
       return next(PopulateResponse.validationError({ message: 'User ID is required' }));
     }
-    const blogs = await DB.SellItem.find({ userId, type: "blog" }).populate('media')
+    const blogs = await DB.SellItem.find({ userId, type: "blog" }).populate('media');
     if (!blogs.length) {
       return next(PopulateResponse.notFound());
     }
@@ -389,12 +430,12 @@ exports.getAllBlogs = async (req, res, next) => {
       code: 200,
       message: 'OK',
       data: blogs
-    });  
-      return next();
+    });
   } catch (error) {
     return next(error);
   }
 };
+
 
 
 exports.getBlogById = async (req, res, next) => {
@@ -415,7 +456,7 @@ exports.getBlogById = async (req, res, next) => {
       message: 'OK',
       data: blog
     }); 
-    return next();
+    // return next();
   } catch (error) {
     return next(error);
   }
