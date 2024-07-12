@@ -5,6 +5,7 @@ import ConversationList from 'src/components/conversation/conversation-list';
 import { loadConversation, setSelectedConversation } from 'src/redux/conversation/actions';
 
 import SearchBar from './search-bar';
+import { useTranslationContext } from 'context/TranslationContext';
 
 const AlertDanger = dynamic(() => import('src/components/common-layout/alert/alert-danger'), { ssr: false });
 
@@ -39,6 +40,7 @@ function ConversationSideBar({
   const searchRef = useRef<string>('');
   const [conversationList, setConversationList] = useState(conversations);
   const ditspatch = useDispatch();
+  const {t} = useTranslationContext()
 
   const filter = () => {
     const newConversations = conversations.filter((con) => {
@@ -70,7 +72,7 @@ function ConversationSideBar({
         <div className="hide-scrollbar h-100" id="chatContactsList">
           <div className="sidebar-header sticky-top p-2">
             <div className="d-flex justify-content-between align-items-center">
-              <h5 className="font-weight-semibold mb-2">Plaudereien</h5>
+              <h5 className="font-weight-semibold mb-2">{t?.conversation}</h5>
             </div>
             <SearchBar handleSearchConversation={handleSearch} />
           </div>

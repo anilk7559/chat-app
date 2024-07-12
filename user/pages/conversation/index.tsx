@@ -1,4 +1,5 @@
 import PageTitle from '@components/page-title';
+import { useTranslationContext } from 'context/TranslationContext';
 import dynamic from 'next/dynamic';
 import Router from 'next/router';
 import { connect, ConnectedProps } from 'react-redux';
@@ -17,6 +18,8 @@ const ConversationSideBar = dynamic(() => import('src/components/common-layout/s
 function ConversationHomePage({
   authUser
 }: PropsFromRedux) {
+  const {t} = useTranslationContext()
+
   return (
     <>
       <PageTitle title="Conversation" />
@@ -50,12 +53,12 @@ function ConversationHomePage({
                 </div>
 
                 <h5>
-                Willkommen,
+                {t?.welcome},
                   {authUser.username}
                   !
                 </h5>
                 <p className="text-muted">
-                Bitte wähle einen Chat aus, um mit der Nachrichtenübermittlung zu beginnen, oder finde weitere Modelle, die dir gefallen, von
+               {t?.conversationMsg}
                   {' '}
                   <a onClick={() => Router.push('/models')}>“Alle Modelle”</a>
                   {' '}

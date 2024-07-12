@@ -1,3 +1,4 @@
+import { useTranslationContext } from 'context/TranslationContext';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import { Button, FormControl } from 'react-bootstrap';
 import * as Yup from 'yup';
@@ -14,6 +15,8 @@ const schema = Yup.object().shape({
 });
 
 function SearchBar({ handleSearchConversation }: IProps) {
+  const {t} = useTranslationContext()
+
   return (
     <div className="sidebar-sub-header">
       <Formik
@@ -34,7 +37,7 @@ function SearchBar({ handleSearchConversation }: IProps) {
                 className="form-control search border-right-0 transparent-bg pr-0"
                 name="username"
                 id="username"
-                placeholder="Suche deinen Chat-Partner"
+                placeholder={t?.search}
                 onChange={(e) => {
                   props.handleChange(e);
                   props.submitForm();

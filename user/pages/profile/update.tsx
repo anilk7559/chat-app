@@ -1,4 +1,5 @@
 import PageTitle from '@components/page-title';
+import { useTranslationContext } from 'context/TranslationContext';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -24,6 +25,8 @@ function UpdateProfile({
 }: PropsFromRedux) {
   const router = useRouter();
   const [showRq, setShowRq] = useState(false);
+  const {t} = useTranslationContext()
+
 
   useEffect(() => {
     if (router.query.requireUpdate === '1') {
@@ -40,7 +43,7 @@ function UpdateProfile({
           <div className="chat-body p-3">
             <div className="row m-0 mb-4">
               <div className="col-md-12">
-                <h4 className="font-weight-semibold">Mein Profil</h4>
+                <h4 className="font-weight-semibold">{t?.profilePage?.title}</h4>
 
                 {showRq && (
                 <div className="alert alert-warning" role="alert">
@@ -53,18 +56,18 @@ function UpdateProfile({
               <div className="col-md-6">
                 <div className="card mb-3">
                   <div className="card-header">
-                    <h6 className="mb-1">Konto</h6>
-                    <p className="mb-0 text-muted small">Aktualisierung der persönlichen Kontaktdaten</p>
+                    <h6 className="mb-1">{t?.profilePage?.account}</h6>
+                    <p className="mb-0 text-muted small">{t?.profilePage?.update}</p>
                   </div>
-                  <PersonalProfileForm />
+                  <PersonalProfileForm t={t} />
                 </div>
               </div>
               <div className="col-md-6">
                 {authUser.type === 'model' && <TokenPerMessageForm />}
                 <div className="card mb-3">
                   <div className="card-header">
-                    <h6 className="mb-1">Passwort</h6>
-                    <p className="mb-0 text-muted small">Kontopasswort aktualisieren</p>
+                    <h6 className="mb-1">{t?.passwordPage?.title}</h6>
+                    <p className="mb-0 text-muted small">{t?.passwordPage?.update}</p>
                   </div>
                   <UpdatePasswordForm />
                 </div>

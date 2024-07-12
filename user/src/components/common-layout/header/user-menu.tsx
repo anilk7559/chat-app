@@ -1,4 +1,5 @@
 import { formatNumber } from '@lib/utils';
+import { useTranslationContext } from 'context/TranslationContext';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
@@ -21,6 +22,7 @@ function UserMenu({
 }: IProps) {
   const router = useRouter();
   const [activeRoute, setActiveRoute] = useState(null);
+  const {t} = useTranslationContext();
 
   const onClickMenu = (url: string, pathname: string) => {
     handleClickToMenu();
@@ -61,7 +63,7 @@ function UserMenu({
           onClick={() => onClickMenu('/profile/update', '/profile/update')}
           active={activeRoute === '/profile/update'}
         >
-         Mein Profil
+         {t?.dropdown?.profile}
         </Dropdown.Item>
         {type === 'model' && (
           <>
@@ -81,27 +83,27 @@ function UserMenu({
           onClick={() => onClickMenu('/blogs/allblogs', '/blogs/allblogs')}
           active={activeRoute === '/blogs/allblogs'}
         >
-         Blog Posts
+         {t?.dropdown?.blogs}
         </Dropdown.Item>
             <Dropdown.Item
               onClick={() => onClickMenu('/profile/media-content', '/media-content')}
               active={['/profile/media-content', '/media-content'].includes(activeRoute)}
 
             >
-              Medieninhalt
+              {t?.dropdown?.media}
             </Dropdown.Item>
             <Dropdown.Item
               onClick={() => onClickMenu('/profile/payout-request', '/payout-request')}
               active={['/profile/payout-request', '/payout-request'].includes(activeRoute)}
             >
-              Auszahlungsantrag
+              {t?.dropdown?.payout}
 
             </Dropdown.Item>
             <Dropdown.Item
               onClick={() => onClickMenu('/earning', '/earning')}
               active={activeRoute === '/earning'}
             >
-              Verdienen
+              {t?.dropdown?.earnings}
 
             </Dropdown.Item>
           </>
@@ -124,26 +126,26 @@ function UserMenu({
               onClick={() => onClickMenu('/profile/purchased-media', '/purchased-media')}
               active={['/profile/purchased-media', '/purchased-media'].includes(activeRoute)}
             >
-              Gekaufte Medien
+              {t?.dropdown?.media}
             </Dropdown.Item>
             <Dropdown.Item
               onClick={() => onClickMenu('/profile/bookmarked-messages', '/bookmarked-messages')}
               active={['/profile/bookmarked-messages', '/bookmarked-messages'].includes(activeRoute)}
 
             >
-              Lesezeichen Nachrichten
+              {t?.dropdown?.bookmarkMsg}
             </Dropdown.Item>
             <Dropdown.Item
               onClick={() => onClickMenu('/tokens/history', '/token-history')}
               active={['/tokens/history', '/token-history'].includes(activeRoute)}
             >
-              Token Geschichte
+              {t?.dropdown?.token}
             </Dropdown.Item>
             <Dropdown.Item
               onClick={() => onClickMenu('/payment-history', '/payment-history')}
               active={activeRoute === '/payment-history'}
             >
-              Zahlungsverhalten
+              {t?.dropdown?.payment}
             </Dropdown.Item>
           </>
         )}
@@ -151,9 +153,9 @@ function UserMenu({
           onClick={() => onClickMenu('/contact-us', '/contact-us')}
           active={activeRoute === '/contact-us'}
         >
-          Kontakt Verwaltung
+          {t?.dropdown?.contact}
         </Dropdown.Item>
-        <Dropdown.Item onClick={() => logout()}>Abmeldung</Dropdown.Item>
+        <Dropdown.Item onClick={() => logout()}>{t?.dropdown?.logout}</Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>
   );

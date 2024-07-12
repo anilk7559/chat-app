@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import { sendMessage } from 'src/redux/message/actions';
 import { mediaService, sellItemService } from 'src/services';
+import { useTranslationContext } from 'context/TranslationContext';
 
 interface IProps {
   selectedConversation: any;
@@ -33,6 +34,7 @@ function ChatFooter({
   haveBeenBlockStatus
 }: IProps) {
   const [sendFileBox, openSendFileBox] = useState(false);
+  const {t} = useTranslationContext()
   const [isBlocked, setIsBlocked] = useState(false);
   const [placeHolder, setPlaceHolder] = useState('Bitte geben Sie Ihre Nachricht hier ein...');
   const [showDialog, setShowDialog] = useState(false);
@@ -286,7 +288,7 @@ function ChatFooter({
                 type="text"
                 name="message"
                 id="message"
-                placeholder={placeHolder}
+                placeholder={t?.messagePlaceHolder || placeHolder}
                 disabled={isBlocked}
                 onChange={props.handleChange.bind(this)}
               />

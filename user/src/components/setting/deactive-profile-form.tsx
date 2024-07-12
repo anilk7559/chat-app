@@ -1,3 +1,4 @@
+import { useTranslationContext } from 'context/TranslationContext';
 import { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import OtpInput from 'react-otp-input';
@@ -22,6 +23,7 @@ function DeactiveProfileForm({
 }: PropsFromRedux) {
   const [code, setCode] = useState('');
   const [disabled, setDisabled] = useState(false);
+  const {t} = useTranslationContext()
 
   const deactive = async () => {
     try {
@@ -68,9 +70,9 @@ function DeactiveProfileForm({
 
   return (
     <div className="card mb-3">
-      <div className="card-header">Account deaktivieren</div>
+      <div className="card-header">{t?.accountdeactivation?.title}</div>
       <div className="card-body card-bg-1">
-        <p>OTP wird an Ihre E-Mail gesendet. Bitte geben Sie es unten ein.</p>
+        <p>{t?.accountdeactivation?.description}</p>
         <OtpInput
           containerStyle="main-input-otp"
           inputStyle="input-otp-mini"
@@ -83,7 +85,7 @@ function DeactiveProfileForm({
       </div>
       <div className="card-footer d-flex justify-content-end">
         <Button variant="primary" type="button" onClick={getOTP.bind(this)}>
-          Account deaktivieren
+          {t?.accountdeactivation?.title}
         </Button>
       </div>
     </div>

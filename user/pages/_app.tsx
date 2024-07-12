@@ -17,6 +17,12 @@ import { loadConfigSuccess, setMenu } from 'src/redux/system';
 import { systemService } from 'src/services';
 import { authService } from 'src/services/auth.service';
 import { Socket } from 'src/socket';
+// import { appWithTranslation } from 'next-i18next';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { TranslationProvider } from '../context/TranslationContext';
+
+
 
 function Application({
   Component,
@@ -24,18 +30,29 @@ function Application({
 }: any) {
   const Layout = Component.Layout || MainLayout;
   const { store, props } = wrapper.useWrappedStore(rest);
+  const router = useRouter();
+  const [lang, setLang] = useState('en'); // Default to English
+
+  useEffect(() => {
+    // Fetch language from the URL or use default
+    const { locale } = router;
+    setLang(locale || 'en');
+  }, [router]);
+
   return (
     <Provider store={store}>
       <SSRProvider>
+      <TranslationProvider>
         <Head>
           <meta name="viewport" content="initial-scale=1.0, width=device-width" />
           <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         </Head>
         <Socket>
-          <Layout>
-            <Component {...props.pageProps} />
+          <Layout lang={lang}>
+            <Component {...props.pageProps} lang={lang} />
           </Layout>
         </Socket>
+        </TranslationProvider>
       </SSRProvider>
     </Provider>
   );

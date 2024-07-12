@@ -19,7 +19,7 @@ const mapStates = (state) => ({
 const connector = connect(mapStates);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
-
+console.log("connect")
 function BlankWithFooterLayout({
   children,
   favicon

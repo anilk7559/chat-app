@@ -1,3 +1,4 @@
+import { useTranslationContext } from 'context/TranslationContext';
 import { City, Country, State } from 'country-state-city';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import { Component } from 'react';
@@ -100,6 +101,8 @@ class PersonalProfileForm extends Component<any, any> {
   render() {
     const { authUser } = this.props;
     const { countries, states, cities } = this.state;
+    const { t } = this.props;
+
     return (
       <div>
         {authUser && authUser._id ? (
@@ -136,7 +139,7 @@ class PersonalProfileForm extends Component<any, any> {
                     <Col md={12} xs={12}>
                       <Form.Group>
                         <Form.Label>
-                        Benutzername
+                        {t?.profilePage?.name}
                           {' '}
                           <span className="text-required required-red">*</span>
                         </Form.Label>
@@ -157,7 +160,7 @@ class PersonalProfileForm extends Component<any, any> {
                     <p className='text-muted mx-auto'>Diese Daten werden nicht im Profil angezeigt</p>
                     <Col md={12} xs={12}>
                       <Form.Group>
-                        <Form.Label>E-Mail Adresse</Form.Label>
+                        <Form.Label>{t?.profilePage?.email}</Form.Label>
                         <FormControl
                           isInvalid={props.touched.email && !!props.errors.email}
                           name="email"
@@ -191,7 +194,7 @@ class PersonalProfileForm extends Component<any, any> {
                     <Col xs={12} md={6}>
                       <Form.Group>
                         <Form.Label>
-                        Alter
+                        {t?.profilePage?.age}
                           {' '}
                           <span className="text-required required-red">*</span>
                         </Form.Label>
@@ -212,7 +215,7 @@ class PersonalProfileForm extends Component<any, any> {
                     </Col>
                     <Col xs={12}>
                       <Form.Group>
-                        <Form.Label>Geschlecht</Form.Label>
+                        <Form.Label>{t?.profilePage?.gender}</Form.Label>
                         <br />
                         <Form.Check
                           type="radio"
@@ -222,7 +225,7 @@ class PersonalProfileForm extends Component<any, any> {
                           className="form-check form-check-inline"
                           name="gender"
                           id="male"
-                          label="Männlich"
+                          label={t?.profilePage?.option?.male}
                         />
                         <Form.Check
                           type="radio"
@@ -232,7 +235,7 @@ class PersonalProfileForm extends Component<any, any> {
                           className="form-check form-check-inline"
                           name="gender"
                           id="female"
-                          label="Weiblich"
+                          label={t?.profilePage?.option?.female}
                         />
                         <Form.Check
                           type="radio"
@@ -242,7 +245,7 @@ class PersonalProfileForm extends Component<any, any> {
                           className="form-check form-check-inline"
                           name="gender"
                           id="transgender"
-                          label="Transsexuelle"
+                          label={t?.profilePage?.option?.transgender}
                         />
                         <div className="invalid-feedback">{props.errors.gender}</div>
                       </Form.Group>
@@ -250,7 +253,7 @@ class PersonalProfileForm extends Component<any, any> {
                     <Col xs={12}>
                       <Form.Group>
                         <Form.Label>
-                        Biografie
+                        {t?.profilePage?.bio}
                           {' '}
                           <span className="text-required required-red">*</span>
                         </Form.Label>
@@ -302,7 +305,7 @@ class PersonalProfileForm extends Component<any, any> {
                     </Col> */}
                     <Col xs={4}>
                       <Form.Group>
-                        <Form.Label>Land</Form.Label>
+                        <Form.Label>{t?.profilePage?.country}</Form.Label>
                         <Form.Control
                           as="select"
                           name="country"
@@ -328,7 +331,7 @@ class PersonalProfileForm extends Component<any, any> {
                     </Col>
                     <Col xs={4}>
                       <Form.Group>
-                        <Form.Label>Staat</Form.Label>
+                        <Form.Label>{t?.profilePage?.province}</Form.Label>
                         <Form.Control
                           as="select"
                           name="state"
@@ -351,7 +354,7 @@ class PersonalProfileForm extends Component<any, any> {
                     </Col>
                     <Col xs={4}>
                       <Form.Group>
-                        <Form.Label>Stadt</Form.Label>
+                        <Form.Label>{t?.profilePage?.city}</Form.Label>
                         <Form.Control
                           as="select"
                           name="city"
@@ -376,7 +379,7 @@ class PersonalProfileForm extends Component<any, any> {
                 </div>
                 <div className="card-footer d-flex justify-content-end">
                   <button type="submit" className="btn btn-primary">
-                  Änderungen speichern
+                  {t?.profilePage?.save}
                   </button>
                 </div>
               </form>

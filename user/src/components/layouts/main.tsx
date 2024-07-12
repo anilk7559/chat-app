@@ -38,6 +38,7 @@ function MainLayout({
 
   useEffect(() => {
     handleStateChange();
+    console.log('state change')
   }, []);
 
   return (

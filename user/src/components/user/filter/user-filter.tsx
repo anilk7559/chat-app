@@ -1,3 +1,5 @@
+import { useTranslationContext } from "context/TranslationContext";
+
 type IProps = {
   onFilter: Function;
   showLocation?: boolean;
@@ -15,6 +17,7 @@ function UserFilter({ onFilter, showLocation = true }: IProps) {
     "01060", "01061", "01062", "01063", "01064", "01065", "01066", "01067", "01068", "01069",
     "02070", "02071", "02072", "02073", "02074", "02075", "02076", "02077", "02078", "02079",
   ];
+  const {t} = useTranslationContext();
 
 
 
@@ -22,22 +25,22 @@ function UserFilter({ onFilter, showLocation = true }: IProps) {
     <>
       <div className="dropdown mr-2">
         <select className="btn btn-outline-default dropdown-toggle" onChange={(e) => onFilter(e.target.value)}>
-          <option value="">Alle</option>
-          <option value="male">Männlich</option>
-          <option value="female">Weiblich</option>
-          <option value="transgender">Transsexuelle</option>
+          <option value="">{t?.header?.option?.all}</option>
+          <option value="male">{t?.header?.option?.male}</option>
+          <option value="female">{t?.header?.option?.female}</option>
+          <option value="transgender">{t?.header?.option?.transgender}</option>
         </select>
       </div>
       <div className="dropdown mr-2">
         <select className="btn btn-outline-default dropdown-toggle" onChange={(e) => onFilter(e.target.value)}>
-          <option value="">Postleitzahl</option>
+          <option value="">{t?.header?.postcode}</option>
           {germanPostalCodes?.map((i) => <option key={i} value={i}>{i.slice(0, 2)}xxxx</option>)}
         </select>
       </div>
       <div className="dropdown mr-2">
         <select className="btn btn-outline-default dropdown-toggle" onChange={(e) => onFilter(e.target.value)}>
-          <option value="">Standort</option>
-          {showLocation && <option value="location">Alle Land</option>}
+          <option value="">{t?.header?.location}</option>
+          {showLocation && <option value="location">{t?.header?.all}</option>}
         </select>
       </div>
     </>

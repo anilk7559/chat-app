@@ -7,10 +7,12 @@ import { NumericFormat } from 'react-number-format';
 import { toast } from 'react-toastify';
 
 import styles from './token-package.module.scss';
+import { useTranslationContext } from 'context/TranslationContext';
 
 function PurchaseTokenList() {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const {t} = useTranslationContext()
 
   const purchasePackage = async (tokenPackage) => {
     if (!window.confirm('Möchten Sie dieses Paket kaufen?')) {
@@ -46,7 +48,7 @@ function PurchaseTokenList() {
   if (!packages.length && !loading) {
     return (
       <div className="row m-0">
-        <Alert variant="danger">Es ist kein Token-Paket erhältlich.</Alert>
+        <Alert variant="danger">{t?.tokenAlert}</Alert>
       </div>
     );
   }

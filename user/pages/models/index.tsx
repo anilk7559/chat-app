@@ -2,6 +2,7 @@ import ContactSearchForm from '@components/contact/contact-search-form';
 import PageTitle from '@components/page-title';
 import { withAuth } from '@redux/withAuth';
 import { userService } from '@services/user.service';
+import { useTranslationContext } from 'context/TranslationContext';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
@@ -33,6 +34,8 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 function ModelList({
   authUser
 }: PropsFromRedux) {
+  const {t} = useTranslationContext();
+
   const pageSize = 12;
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -139,7 +142,7 @@ function ModelList({
         <div className="chat-body p-3">
           <Row className="m-0">
             <Col md={4} xs={12}>
-              <h4 className="set-font-size my-3">Werden Sie intim. Keine Bedingungen gestellt!</h4>
+              <h4 className="set-font-size my-3">{t?.title}</h4>
             </Col>
             <Col md={8} xs={12} sm={12} className=" mb-2">
               <Row className="m-0">

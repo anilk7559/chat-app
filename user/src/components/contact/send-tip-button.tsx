@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { IUser } from 'src/interfaces/user';
 
 import ShareLoveModal from './modal/share-love-modal';
+import { useTranslationContext } from 'context/TranslationContext';
 
 type IProps = {
   model: any;
@@ -16,6 +17,7 @@ function SendTipButton({
   model
 }: IProps) {
   const [showModal, setShowModal] = useState(false);
+  const {t} = useTranslationContext()
 
   const sendTip = async ({ token }) => {
     try {
@@ -47,7 +49,7 @@ function SendTipButton({
       >
         <i className="far fa-heart" />
         {' '}
-        Teilen Sie einen Tipp
+        {t?.sendTip}
       </a>
       <ShareLoveModal
         show={showModal}

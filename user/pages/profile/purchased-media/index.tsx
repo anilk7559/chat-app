@@ -1,3 +1,4 @@
+import { useTranslationContext } from 'context/TranslationContext';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { connect } from 'react-redux';
@@ -13,6 +14,7 @@ function PurchasedMediaPage({ authUser }: IProps) {
   const [isOpenMedia, setIsOpenMedia] = useState(false);
   const [mediaItem, setMediaItem] = useState(null);
   const [titleModal, setTitleModal] = useState('');
+  const {t} = useTranslationContext()
 
   const openMedia = (item: any) => {
     setIsOpenMedia(true);
@@ -28,12 +30,12 @@ function PurchasedMediaPage({ authUser }: IProps) {
 
   return (
     <main className="main scroll">
-      <PageTitle title="Gekaufte Medien" />
+      <PageTitle title={t?.mediaPage?.title} />
       <div className="chats">
         <div className="chat-body p-3">
           <div className="row m-0 mb-4">
             <div className="col-md-12">
-              <h4 className="font-weight-semibold">Gekaufte Medien</h4>
+              <h4 className="font-weight-semibold">{t?.mediaPage?.title}</h4>
             </div>
           </div>
           <div className="row m-0">

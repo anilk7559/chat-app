@@ -1,3 +1,4 @@
+import { useTranslationContext } from 'context/TranslationContext';
 import { Formik } from 'formik';
 import {
   useEffect, useRef, useState
@@ -16,6 +17,7 @@ import * as Yup from 'yup';
 function ContactUsForm() {
   const [submitting, setSubmitting] = useState(false);
   const [countTime, setCountTime] = useState(0);
+  const {t} = useTranslationContext()
 
   const _intervalCountdown = useRef(null);
   const schema = Yup.object().shape({
@@ -63,10 +65,10 @@ function ContactUsForm() {
         <Card>
           <Card.Body>
             <Card.Title className="font-weight-semibold text-center" style={{ fontSize: ' 1.5rem' }}>
-            Kontakt
+            {t?.contact?.title}
             </Card.Title>
             <Card.Subtitle className="text-center text-muted" style={{ fontSize: 13 }}>
-            Bitte füllen Sie alle Informationen aus, und wir werden uns innerhalb von 48 Stunden bei Ihnen melden
+              {t?.contact?.description}
             </Card.Subtitle>
           </Card.Body>
           <Formik
@@ -85,7 +87,7 @@ function ContactUsForm() {
               <Form onSubmit={handleSubmit}>
                 <Card.Body as={Row}>
                   <Form.Group as={Col} md={12} xs={12}>
-                    <Form.Label>Name</Form.Label>
+                    <Form.Label>{t?.contact?.name}</Form.Label>
                     <Form.Control
                       type="text"
                       name="name"
@@ -100,7 +102,7 @@ function ContactUsForm() {
                     <Form.Control.Feedback className="invalid-feedback">{errors.name as any}</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group as={Col} md={12} xs={12}>
-                    <Form.Label>E-Mail</Form.Label>
+                    <Form.Label>{t?.contact?.email}</Form.Label>
                     <Form.Control
                       type="email"
                       name="email"
@@ -115,7 +117,7 @@ function ContactUsForm() {
                     <Form.Control.Feedback className="invalid-feedback">{errors.email as any}</Form.Control.Feedback>
                   </Form.Group>
                   <Form.Group as={Col} md={12} xs={12}>
-                    <Form.Label>Beschreibung</Form.Label>
+                    <Form.Label>{t?.contact?.message}</Form.Label>
                     <Form.Control
                       as="textarea"
                       name="message"
@@ -133,7 +135,7 @@ function ContactUsForm() {
                       type="submit"
                       disabled={submitting || countTime > 0}
                     >
-                      Absenden
+                      {t?.contact?.submit}
                     </Button>
                   </Form.Group>
                 </Card.Body>

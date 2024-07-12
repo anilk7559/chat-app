@@ -129,9 +129,9 @@ function ListPurchasedItems({
                         </h5>
                         <div className="overlay" />
                       </div>
-                      <div className="media-name">
+                      {/* <div className="media-name">
                         {item?.name}
-                      </div>
+                      </div> */}
                     </Col>
                   ))}
                 </Row>

@@ -14,6 +14,7 @@ import { updateTotalUnreadMessage } from 'src/redux/conversation/actions';
 
 import SendMailModal from './send-mail.modal';
 import UserMenu from './user-menu';
+import { useTranslationContext } from 'context/TranslationContext';
 
 const mapStates = (state: any) => ({
   isLoggedIn: state.auth.isLoggedIn,
@@ -35,6 +36,8 @@ function Header({
 }: PropsFromRedux) {
   const [showInviteUser, setShowInviteUser] = useState(false);
   const [activeRoute, setActiveRoute] = useState(null);
+  const {t} = useTranslationContext();
+
 
   const router = useRouter();
   const totalUnreadMessage = useSelector((state: any) => state.conversation.totalUnreadMessage);
@@ -112,7 +115,7 @@ function Header({
                   />
                 </svg>
                 {' '}
-                <span className="hide-mobile">Chatten Zimmer</span>
+                <span className="hide-mobile">{t?.header?.chat}</span>
               </Button>
               {totalUnreadMessage > 0 && activeRoute !== 'conversation' && (
                 <p>
@@ -161,7 +164,7 @@ function Header({
               >
                 <i className="fa fa-users" />
                 {' '}
-                <span className="hide-mobile">Alle Modelle</span>
+                <span className="hide-mobile">{t?.header?.models}</span>
               </a>
             </li>
             {authUser?.type === 'user'
@@ -174,7 +177,7 @@ function Header({
                   >
                     <i className="far fa-heart" />
                     {' '}
-                    <span className="hide-mobile">Meine Favoriten</span>
+                    <span className="hide-mobile">{t?.header?.favorites}</span>
                   </a>
                 </li>]}
             <li className="nav-item ">
@@ -195,7 +198,7 @@ function Header({
               >
                 <i className="fas fa-user-plus" />
                 {' '}
-                <span className="hide-mobile">Nutzer einladen</span>
+                <span className="hide-mobile">{t?.header?.invite}</span>
               </a>
             </li>
             <li className="nav-item dropdown user-dropdown" data-toggle="tooltip" title="My profile">

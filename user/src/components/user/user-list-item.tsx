@@ -1,6 +1,7 @@
 import ChatButton from '@components/conversation/chat-button';
 import FromNow from '@components/from-now';
 import { contactService } from '@services/contact.service';
+import { useTranslationContext } from 'context/TranslationContext';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
 import { Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
@@ -33,6 +34,8 @@ function UserListItem({
   const isFriend = useRef<boolean>(user.isFriend);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const {t} = useTranslationContext();
+
 
   // TODO - detect with user gender
   const avatarUrl = user.avatarUrl || '/images/user3.jpg';
@@ -136,7 +139,7 @@ function UserListItem({
                 onClick={checkProfile}
               >
                 <i className="fas fa-user-circle" />
-                <span> Profil prüfen</span>
+                <span> {t?.modelLists?.profile}</span>
               </button>
             </div>
           </div>
@@ -170,7 +173,7 @@ function UserListItem({
                 placement="top"
                 overlay={(
                   <Tooltip id="tooltip">
-                    <span className="text-tooltip">Profil prüfen</span>
+                    <span className="text-tooltip">{t?.modelLists?.profile}</span>
                   </Tooltip>
                 )}
               >
@@ -181,7 +184,7 @@ function UserListItem({
                   disabled={loading}
                 >
                   <i className="fas fa-user-circle" />
-                  <span className="ml-1 text-chat">Profil prüfen</span>
+                  <span className="ml-1 text-chat">{t?.modelLists?.profile}</span>
                 </button>
               </OverlayTrigger>
             </div>

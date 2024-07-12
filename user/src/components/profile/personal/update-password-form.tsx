@@ -1,4 +1,5 @@
 import { authService } from '@services/auth.service';
+import { useTranslationContext } from 'context/TranslationContext';
 import { Formik, FormikHelpers, FormikProps } from 'formik';
 import { omit } from 'lodash';
 import {
@@ -47,6 +48,8 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 function UpdatePasswordForm({
   authUser
 }: PropsFromRedux) {
+
+  const {t} = useTranslationContext()
   const updatePassword = async (data) => {
     try {
       await authService.updatePassword(data);
@@ -85,13 +88,13 @@ function UpdatePasswordForm({
               <Row>
                 <Col md={6} xs={12}>
                   <Form.Group>
-                    <Form.Label>Aktuelles Passwort</Form.Label>
+                    <Form.Label>{t?.passwordPage?.old}</Form.Label>
                     <FormControl
                       isInvalid={props.touched.password && !!props.errors.password}
                       name="password"
                       className="form-control form-control-md"
                       type="password"
-                      placeholder="Aktuelles Passwort"
+                      placeholder={t?.passwordPage?.old}
                       onChange={props.handleChange}
                       onBlur={props.handleBlur}
                       value={props.values.password}
@@ -103,13 +106,13 @@ function UpdatePasswordForm({
               <Row>
                 <Col md={6} xs={12}>
                   <Form.Group>
-                    <Form.Label>Neues Passwort</Form.Label>
+                    <Form.Label>{t?.passwordPage?.new}</Form.Label>
                     <FormControl
                       isInvalid={props.touched.newPassword && !!props.errors.newPassword}
                       name="newPassword"
                       className="form-control form-control-md"
                       type="password"
-                      placeholder="Neues Passwort"
+                      placeholder={t?.passwordPage?.new}
                       onChange={props.handleChange}
                       onBlur={props.handleBlur}
                       value={props.values.newPassword}
@@ -119,13 +122,13 @@ function UpdatePasswordForm({
                 </Col>
                 <Col md={6} xs={12}>
                   <Form.Group>
-                    <Form.Label>Passwort wiederholen</Form.Label>
+                    <Form.Label>{t?.passwordPage?.confirm}</Form.Label>
                     <FormControl
                       isInvalid={props.touched.repeatPassword && !!props.errors.repeatPassword}
                       name="repeatPassword"
                       className="form-control form-control-md"
                       type="password"
-                      placeholder="Passwort wiederholen"
+                      placeholder={t?.passwordPage?.confirm}
                       onChange={props.handleChange}
                       onBlur={props.handleBlur}
                       value={props.values.repeatPassword}
@@ -137,7 +140,7 @@ function UpdatePasswordForm({
             </div>
             <div className="card-footer d-flex justify-content-end">
               <button type="submit" className="btn btn-primary">
-              Änderungen speichern
+              {t?.passwordPage?.save}
               </button>
             </div>
           </form>

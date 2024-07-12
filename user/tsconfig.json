@@ -38,7 +38,12 @@
         "./src/*"
       ]
     },
-    "incremental": true
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "exclude": [
     "node_modules"
@@ -47,6 +52,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "./src/**/*"
-, "server/routes.ts.bk"  ]
+    "./src/**/*",
+    "server/routes.ts.bk",
+    ".next/types/**/*.ts"
+  ]
 }

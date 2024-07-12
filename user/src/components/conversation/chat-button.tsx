@@ -1,4 +1,5 @@
 import { conversationService } from '@services/conversation.service';
+import { useTranslationContext } from 'context/TranslationContext';
 import { useRouter } from 'next/router';
 import { ReactNode, useState } from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
@@ -29,6 +30,8 @@ function ChatButton({
 }: IProps & PropsFromRedux) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const {t} = useTranslationContext();
+
 
   /**
    * redirect to chat page
@@ -66,7 +69,7 @@ function ChatButton({
       placement="top"
       overlay={(
         <Tooltip id="tooltip">
-          <span className="text-tooltip">Chatten</span>
+          <span className="text-tooltip">{t?.modelLists?.chat}</span>
         </Tooltip>
     )}
     >
@@ -79,7 +82,7 @@ function ChatButton({
         {!!chidren || (
         <>
           <i className="far fa-comments" />
-          <span className="ml-1 text-chat">Chatten</span>
+          <span className="ml-1 text-chat">{t?.modelLists?.chat}</span>
         </>
         )}
 

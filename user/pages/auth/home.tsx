@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { setLogin } from "src/redux/auth/actions";
 import { showError } from "@lib/utils";
 import { Baseurl } from "@services/api-request";
+import { useTranslationContext } from "context/TranslationContext";
 interface FormData {
   email: string;
   password: string;
@@ -251,6 +252,8 @@ function Home({ authUser, dispatchSetLogin }: IProps & PropsFromRedux) {
     password: "",
     isKeepLogin: false,
   });
+  const {t} = useTranslationContext();
+
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -363,7 +366,7 @@ function Home({ authUser, dispatchSetLogin }: IProps & PropsFromRedux) {
           <div className="row col-md-12 col-12 " style={{ flexWrap: "wrap" }}>
             <div className="col-md-6 col-12 text-left">
               <h4 className="set-font-size my-3">
-                Werden Sie intim. Keine Bedingungen gestellt!
+                {t?.title}
               </h4>
             </div>
             <div className="col-md-6 col-12 text-right">
@@ -535,7 +538,7 @@ function Home({ authUser, dispatchSetLogin }: IProps & PropsFromRedux) {
                               <span
                                 style={{ fontSize: "11px", marginLeft: "5px" }}
                               >
-                                Chatten
+                                {t?.modelLists?.chat}
                               </span>
                             </button>
                           </div>
@@ -562,7 +565,7 @@ function Home({ authUser, dispatchSetLogin }: IProps & PropsFromRedux) {
                               <span
                                 style={{ fontSize: "11px", marginLeft: "5px" }}
                               >
-                                Profil prüfen
+                                {t?.modelLists?.profile}
                               </span>
                             </button>
                           </div>

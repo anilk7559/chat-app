@@ -1,5 +1,6 @@
 import PageTitle from '@components/page-title';
 import { earningService } from '@services/earning.service';
+import { useTranslationContext } from 'context/TranslationContext';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
@@ -19,6 +20,7 @@ function TokenHistoryPage() {
   const [query, setQuery] = useState(initialQuery);
   const [items, setItems] = useState({} as any);
   const [total, setTotal] = useState(0);
+  const {t} = useTranslationContext()
 
   const loadEarning = async () => {
     try {
@@ -43,10 +45,10 @@ function TokenHistoryPage() {
   return (
     <main className="main scroll">
       <Container fluid className="p-3">
-        <PageTitle title="Tokenverlauf" />
+        <PageTitle title={t?.tokenPage?.title} />
         <Row className="m-0 mgB20 flex">
           <Col md={12} className="mb-4">
-            <h4 className="font-weight-semibold">Tokenverlauf</h4>
+            <h4 className="font-weight-semibold">{t?.tokenPage?.title}</h4>
           </Col>
           <Col md={6} className="mt-2">
             Anzeigen

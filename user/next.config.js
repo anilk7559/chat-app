@@ -1,9 +1,12 @@
 const path = require('path');
+const { i18n } = require('./next-i18next.config');
+
 
 module.exports = {
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')]
-  },
+  }, 
+  i18n,
   distDir: 'dist/.next',
   eslint: {
     // Warning: This allows production builds to successfully complete even if
