@@ -9,9 +9,6 @@ export const TranslationProvider = ({ children }) => {
   const [t, setT] = useState(null)
     const router = useRouter();
   const lang = getDictionary(router.locale).then(data => setT(data))
-  console.log('====================================');
-  console.log(router.locale);
-  console.log('====================================');
   return (
     <TranslationContext.Provider value={{
       lang, t
