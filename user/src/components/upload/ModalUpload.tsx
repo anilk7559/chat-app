@@ -45,6 +45,7 @@ function ModalUpload({
       <Modal.Body>
         <Upload
           url={url}
+          isChecked={true}
           onComplete={onCompleteSingleFile}
           onCompletedAll={onCompleteAllFile}
           config={{
