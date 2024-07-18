@@ -44,6 +44,10 @@ exports.core = async (kernel) => {
   }
 
   kernel.app.use(express.static(this.config.publicPath));
+   // Simple GET endpoint
+   kernel.app.get('/', (req, res) => {
+    res.status(200).send('Hello, World!');
+  });
 
   kernel.app.get('/api-author', (req, res) => {
     res.status(200).send({
