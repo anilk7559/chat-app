@@ -28,14 +28,19 @@ exports.core = async (kernel) => {
   kernel.app.locals.baseUrl = nconf.get('baseUrl');
 
   // Enable CORS for all origins
-  kernel.app.use(cors({ origin: "*" }));
+  kernel.app.use(cors({ origin: "*", methods: "GET,POST,PUT,DELETE", allowedHeaders: "Authorization,Content-Type" }));
 
   // Custom CORS headers
   kernel.app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
-    next();
+    res.setHeader('Access-Control-Allow-Private-Network', 'true'); // Allow requests from private networks
+    if (req.method === 'OPTIONS') {
+      res.status(204).end();
+    } else {
+      next();
+    }
   });
 
   kernel.app.use(bodyParser.urlencoded({ extended: false }));
