@@ -91,8 +91,8 @@ function Header({
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light top-nav navbar-menu-mobile">
       <a aria-hidden className={`navbar-brand ${activeRoute === 'models' && 'active'}`} href="/models">
-        {/* <img alt="img_logo_header" src={appConfig.siteLogo || '/images/logo.svg'} /> */}
-        <h1>App</h1>
+        <img alt="img_logo_header" src={appConfig.siteLogo || '/images/logo.svg'} />
+        {/* <h1>App</h1> */}
       </a>
       <div className="navbar-menu">
         <div className="collapse navbar-collapse show" id="navbarNav">
