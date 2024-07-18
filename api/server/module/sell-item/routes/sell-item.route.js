@@ -1,5 +1,6 @@
 const sellItemController = require('../controllers/sell-item.controller');
 const folderController = require('../controllers/folder.controller');
+const { router } = require('..');
 
 module.exports = (router) => {
   /**
@@ -174,4 +175,8 @@ router.get(
   sellItemController.getBlogById,
   Middleware.Response.success('getBlogById')
 );
+
+router.get(
+  '/v1/test', sellItemController.test)
 };
+
