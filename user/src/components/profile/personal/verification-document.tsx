@@ -517,6 +517,7 @@ class VerificationDocumentComponent extends Component<any, any> {
                   <Col md={12} xs={12}>
                     <Form.Group>
                       <Upload
+                        isChecked={true}
                         url={`${config.API_ENDPOINT}/users/certification/photo?position=frontSide`}
                         onComplete={(e: any) => this.uploadPhoto('uploadFrontSide', 'frontSideUrl', e)}
                         config={{
@@ -548,6 +549,7 @@ class VerificationDocumentComponent extends Component<any, any> {
                     <Col md={12} xs={12}>
                       <Form.Group>
                         <Upload
+                        isChecked={true}
                           url={`${config.API_ENDPOINT}/users/certification/photo?position=backSide`}
                           onComplete={(e: any) => this.uploadPhoto('uploadBackSide', 'backSideUrl', e)}
                           config={{
@@ -579,6 +581,7 @@ class VerificationDocumentComponent extends Component<any, any> {
                   <Col md={12} xs={12}>
                     <Form.Group>
                       <Upload
+                      isChecked={true}
                         url={`${config.API_ENDPOINT}/users/certification/photo?position=holding`}
                         onComplete={(e: any) => this.uploadPhoto('uploadHolding', 'holdingUrl', e)}
                         config={{
