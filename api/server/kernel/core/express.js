@@ -25,15 +25,17 @@ exports.core = async (kernel) => {
   kernel.app.set('views', path.join(__dirname, '..', '..', 'views'));
   kernel.app.set('view cache', false);
   kernel.app.disable('x-powered-by');
-  // eslint-disable-next-line no-param-reassign
   kernel.app.locals.baseUrl = nconf.get('baseUrl');
 
-  process.env.ALLOW_CORS && kernel.app.use(cors());
+  // Enable CORS for all origins
+  kernel.app.use(cors({ origin: "*" }));
+
   kernel.app.use(bodyParser.urlencoded({ extended: false }));
   kernel.app.use(bodyParser.json());
   kernel.app.use(methodOverride());
+
   if (process.env.NODE_ENV === 'production') {
-    // log only 4xx and 5xx responses to console
+    // Log only 4xx and 5xx responses to console
     kernel.app.use(morgan('dev', {
       skip(req, res) {
         return res.statusCode !== 500;
@@ -44,11 +46,13 @@ exports.core = async (kernel) => {
   }
 
   kernel.app.use(express.static(this.config.publicPath));
-   // Simple GET endpoint
-   kernel.app.get('/', (req, res) => {
+
+  // Simple GET endpoint
+  kernel.app.get('/', (req, res) => {
     res.status(200).send('Hello, World!');
   });
 
+  // Example API endpoint
   kernel.app.get('/api-author', (req, res) => {
     res.status(200).send({
       author: 'Tuong Tran <tuong.tran@outlook.com>',
