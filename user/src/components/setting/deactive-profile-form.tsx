@@ -80,7 +80,8 @@ function DeactiveProfileForm({
           numInputs={4}
           value={code}
           shouldAutoFocus={false}
-          isDisabled={disabled}
+          // isDisabled={disabled}
+          renderInput={(props) => <input {...props} />}
         />
       </div>
       <div className="card-footer d-flex justify-content-end">

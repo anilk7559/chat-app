@@ -141,13 +141,14 @@ function PayoutRequestModal({
                   <Form.Group>
                     <Form.Label>Die OTP wurde an Ihre E-Mail gesendet. Bitte geben Sie sie unten ein.</Form.Label>
                     <OtpInput
-                      containerStyle="otp-container-custom"
-                      inputStyle="otp-mini-custom"
-                      onChange={onChangeValue}
-                      numInputs={4}
-                      value={verifyCode}
-                      shouldAutoFocus
-                    />
+                    containerStyle="otp-container-custom"
+                    inputStyle="otp-mini-custom"
+                    onChange={onChangeValue}
+                    numInputs={6}
+                    value={verifyCode}
+                    shouldAutoFocus={true}
+                    renderInput={(props) => <input {...props} />}
+                  />
                   </Form.Group>
                 </div>
                 )}
