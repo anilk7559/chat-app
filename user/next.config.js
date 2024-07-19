@@ -7,7 +7,7 @@ module.exports = {
     includePaths: [path.join(__dirname, 'styles')]
   }, 
   i18n,
-  distDir: 'dist',
+  distDir: 'dist/.next',
   eslint: {
     // Warning: This allows production builds to successfully complete even if
     // your project has ESLint errors. in development we need to run yarn lint
