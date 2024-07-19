@@ -3,12 +3,12 @@ import cookie from 'js-cookie';
 import getConfig from 'next/config';
 import Router from 'next/router';
 import { isUrl, updateQueryStringParameter } from 'src/lib/utils';
-export const  Baseurl = "http://localhost:8080/v1";
+export const  Baseurl = "https://chat-app-eaxp.onrender.com/v1";
 export abstract class APIRequest {
   static token: string = '';
 
   // static API_ENDPOINT: string = null;
-  static API_ENDPOINT: string = "http://localhost:8080/v1";
+  static API_ENDPOINT: string = "https://chat-app-eaxp.onrender.com/v1"; 
   setAuthHeaderToken(token) {
     APIRequest.token = token;
   }

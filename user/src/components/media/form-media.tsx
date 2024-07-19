@@ -35,7 +35,7 @@ const schema = Yup.object().shape({
 function FormMedia() {
   const [fileUpload, setFileUpload] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
-  const API_SERVER_ENDPOINT: string = 'http://localhost:8080/v1';
+  const API_SERVER_ENDPOINT: string = 'https://chat-app-eaxp.onrender.com/v1';
   const { publicRuntimeConfig: config } = getConfig();
   const [mediaId, setMediaId] = useState('');
   // const [url, setUrl] = useState(`${config.API_ENDPOINT}/media/photos`); // used (`${config.API_ENDPOINT}/media/photos`) changed to process.env.API_SERVER_ENDPOINT

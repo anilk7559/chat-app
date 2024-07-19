@@ -30,7 +30,7 @@ const schema = Yup.object().shape({
 function Blogs() {
   const [fileUpload, setFileUpload] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
-  const API_SERVER_ENDPOINT: string = 'http://localhost:8080/v1';
+  const API_SERVER_ENDPOINT: string = 'https://chat-app-eaxp.onrender.com/v1';
   // const { publicRuntimeConfig: config } = getConfig();
   const [mediaId, setMediaId] = useState('');
   const [url, setUrl] = useState(`${API_SERVER_ENDPOINT}/media/photos`);

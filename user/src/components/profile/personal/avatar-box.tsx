@@ -35,7 +35,7 @@ function AvatarComponent({ avatarUrl, onUploadAvatarComplete }: IProps) {
         </a>
       </div>
       <ModalUpload
-        url={`http://localhost:8080/v1/users/avatar`}
+        url={`https://chat-app-eaxp.onrender.com/v1/users/avatar`}
         onCompleteFile={onComplete}
         key="modal-upload"
         modalShow={modalShow}
