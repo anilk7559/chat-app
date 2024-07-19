@@ -55,13 +55,15 @@ server/config/local.json
 apidocs/*
 
 ## custom public folder ##
-public/avatar
-public/photos
-public/videos
-public/documents
-public/files
-public/certification
-public/protected
+# Exclude all public folders except the ones specified
+public/*
+!public/avatar
+!public/photos
+!public/videos
+!public/documents
+!public/files
+!public/certification
+!public/protected
 
 ## test ##
 coverage
