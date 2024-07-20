@@ -61,7 +61,7 @@ function Blogs() {
         mediaId,
       });
       toast.success('Medieninhalt wurde erfolgreich hochgeladen. Bitte warten Sie auf die Genehmigung durch den Administrator.');
-      setTimeout(() => router.push('/profile/media-content'), 3000);
+      setTimeout(() => router.push('/blogs/allblogs'), 3000);
     } catch (e) {
       setDisabled(false);
       const err = await e;

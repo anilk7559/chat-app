@@ -15,7 +15,6 @@ const ChatFooter = dynamic(() => import('src/components/chat-box/footer/footer')
 interface IProps {
   selectedConversation: any;
   conversationId: string;
-  // todo - refactor above
   total: number;
   loadMessageStore: {
     requesting: boolean;
@@ -49,54 +48,39 @@ function MessagePage({
   sendMessageStore,
   loadOldMessageStore
 }: IProps) {
-  const ditspatch = useDispatch();
+  const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const take = 20;
   const chatRef = useRef<any>();
 
-  const checkConversationId = () => {
-    if (conversationId) {
-      ditspatch(loadMessage({ conversationId, query: { page, take } }));
-      // ditspatch(setSelectedConversation(conversationId));
-      if (total > 0 && chatRef?.current) {
-        chatRef.current.scrollTop = chatRef.current?.scrollHeight;
-      }
-    } else {
+  const fetchMessages = async () => {
+    dispatch(loadMessage({ conversationId, query: { page, take } }));
+  };
+
+  const getConversation = async (id: string) => {
+    try {
+      setLoading(true);
+      const resp = await conversationService.findOne(id);
+      dispatch(setSelectedConversation(resp.data));
+    } catch {
       Router.push('/conversation');
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    checkConversationId();
-  }, []);
-
-  useEffect(() => {
-    const getConversation = async (id: string) => {
-      try {
-        setLoading(true);
-        const resp = await conversationService.findOne(id);
-        ditspatch(setSelectedConversation(resp.data));
-      } catch {
-        Router.push('/conversation');
-      } finally {
-        setLoading(false);
-      }
-    };
     if (conversationId) {
-      ditspatch(loadMessage({ conversationId, query: { take, page: 1 } }));
-      // ditspatch(setSelectedConversation(conversationId));
+      fetchMessages();
       getConversation(conversationId);
+    } else {
+      Router.push('/conversation');
     }
   }, [conversationId]);
 
   useEffect(() => {
-    if (
-      !sendMessageStore.requesting
-      && sendMessageStore.success
-      && !sendMessageStore.error
-      && chatRef.current
-    ) {
+    if (!sendMessageStore.requesting && sendMessageStore.success && !sendMessageStore.error && chatRef.current) {
       setTimeout(() => {
         chatRef.current?.scrollBy({
           top: chatRef.current?.scrollHeight + 300,
@@ -104,21 +88,14 @@ function MessagePage({
         });
       }, 500);
     }
-    if (
-      !sendMessageStore.requesting
-      && !sendMessageStore.success
-      && sendMessageStore.error
-    ) {
+    if (!sendMessageStore.requesting && !sendMessageStore.success && sendMessageStore.error) {
       toast.error(sendMessageStore.error?.data?.message || 'Senden der Nachricht fehlgeschlagen!');
-      ditspatch(removeSendMessgeStatus());
+      dispatch(removeSendMessgeStatus());
     }
   }, [sendMessageStore]);
 
   useEffect(() => {
-    if (
-      !sendMessageStore.requesting
-      && chatRef.current
-    ) {
+    if (!sendMessageStore.requesting && chatRef.current) {
       setTimeout(() => {
         chatRef.current?.scrollBy({
           top: chatRef.current?.scrollHeight + 300,
@@ -129,12 +106,7 @@ function MessagePage({
   }, [total]);
 
   useEffect(() => {
-    if (
-      loadOldMessageStore.requesting
-      && loadOldMessageStore.success
-      && !loadOldMessageStore.error
-    ) {
-      // this.chatRef.current?.scrollTop = 300;
+    if (loadOldMessageStore.requesting && loadOldMessageStore.success && !loadOldMessageStore.error) {
       setTimeout(() => {
         chatRef.current?.scrollBy({
           top: chatRef.current?.scrollTop + 300,
@@ -145,23 +117,21 @@ function MessagePage({
   }, [loadOldMessageStore]);
 
   useEffect(() => {
-    ditspatch(loadOldMessage({ conversationId, query: { take, page } }));
+    if (page > 1) {
+      dispatch(loadOldMessage({ conversationId, query: { take, page } }));
+    }
   }, [page]);
 
   const onChatScroll = (e: any) => {
     if (take * page - total > take) {
-      // Cannot load more message
+      // Cannot load more messages
       return;
     }
-    if (
-      conversationId
-      && e.currentTarget.scrollTop === 0
-      && !loadOldMessageStore.error
-      && !loadOldMessageStore.requesting
-    ) {
+    if (conversationId && e.currentTarget.scrollTop === 0 && !loadOldMessageStore.error && !loadOldMessageStore.requesting) {
       setPage(page + 1);
     }
   };
+
   return (
     <>
       <ConversationSideBar conversationId={conversationId} />
@@ -178,7 +148,6 @@ function MessagePage({
               {loading && <p>Loading...</p>}
               {!loadMessageStore.requesting && <ChatContent />}
             </div>
-
             {!loadMessageStore.requesting && selectedConversation && <ChatFooter />}
           </div>
         </div>

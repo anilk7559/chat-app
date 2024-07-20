@@ -304,15 +304,14 @@ exports.modelSellItem = async (req, res, next) => {
 exports.modelSellItems = async (req, res, next) => {
   const page = Math.max(0, req.query.page - 1) || 0; // using a zero-based page index for use with skip()
   const take = parseInt(req.query.take, 10) || 10;
-  console.log(req.query.modelId, "idissssssssssss");
   try {
     // Retrieve folders for the specified model
-    const folders = await Folder.find({ userId: '6683cce9a5e475a6ac5c0731' || req.query.modelId });
+    const folders = await Folder.find({ userId: req.query.modelId  || '6683cce9a5e475a6ac5c0731' });
     console.log(folders, "folders");
 
     // Get count of sell items that are approved
     const count = await DB.SellItem.count({
-      userId: '6683cce9a5e475a6ac5c0731' || req.query.modelId,
+      userId: req.query.modelId  || '6683cce9a5e475a6ac5c0731',
       mediaType: req.query.mediaType,
       isApproved: true
     });

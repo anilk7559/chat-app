@@ -221,15 +221,15 @@ function MediaContent({
   ) : (
     <p className="text-alert-danger">Sie haben kein Foto verfügbar!</p>
   )}
-  {itemsPhoto.length > 0 && totalPhoto > 0 && totalPhoto > take && <MainPaginate currentPage={pagePhoto} pageTotal={totalPhoto} pageNumber={take} setPage={setPagePhoto} />}
+  {itemsPhoto?.length > 0 && totalPhoto > 0 && totalPhoto > take && <MainPaginate currentPage={pagePhoto} pageTotal={totalPhoto} pageNumber={take} setPage={setPagePhoto} />}
         </Tab>
 
           <Tab eventKey="video" title={`Videos (${totalVideo})`}>
             {loading && <Loading />}
-            {!loading && itemsVideo.length > 0
+            {!loading && itemsVideo?.length > 0
               ? (
                 <Row>
-                  {itemsVideo.map((item: any, index: any) => (
+                  {itemsVideo?.map((item: any, index: any) => (
                     <Col xs={6} sm={6} md={6} lg={4} key={item._id + index as any} data-toggle="tooltip" title={item.name}>
                       <div className="image-box mt-1 mb-1 active pt-100">
                         <img
@@ -258,10 +258,10 @@ function MediaContent({
                   )) }
                 </Row>
               ) : <p className="text-alert-danger">Sie haben kein Video verfügbar!</p>}
-            {itemsVideo.length > 0 && totalVideo > 0 && totalVideo > take && <MainPaginate currentPage={pageVideo} pageTotal={totalVideo} pageNumber={take} setPage={setPageVideo} />}
+            {itemsVideo?.length > 0 && totalVideo > 0 && totalVideo > take && <MainPaginate currentPage={pageVideo} pageTotal={totalVideo} pageNumber={take} setPage={setPageVideo} />}
           </Tab>
 
-          <Tab eventKey="pending" title={`Pending (${totalPhoto})`}>
+          <Tab eventKey="pending" title={`Pending (${pendingPhotos?.length})`}>
   {loading && <Loading />}
   {!loading && pendingPhotos?.length > 0 ? (
     <Row className=''>
@@ -316,7 +316,7 @@ function MediaContent({
   ) : (
     <p className="text-alert-danger">Sie haben kein Foto verfügbar!</p>
   )}
-  {itemsPhoto.length > 0 && totalPhoto > 0 && totalPhoto > take && <MainPaginate currentPage={pagePhoto} pageTotal={totalPhoto} pageNumber={take} setPage={setPagePhoto} />}
+  {itemsPhoto?.length > 0 && totalPhoto > 0 && totalPhoto > take && <MainPaginate currentPage={pagePhoto} pageTotal={totalPhoto} pageNumber={take} setPage={setPagePhoto} />}
         </Tab>
         </Tabs>
 

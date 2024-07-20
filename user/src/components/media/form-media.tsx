@@ -47,21 +47,22 @@ function FormMedia() {
   const [selectedFolder, setSelectedFolder] = useState('');
   const [newFolderName, setNewFolderName] = useState('');  
 
+  const fetchFolders = async () => {
+    const response = await sellItemService.getFolders();      
+    setFolders(response?.folders);
+  };
 
   useEffect(() => {
-    const fetchFolders = async () => {
-      const response = await sellItemService.getFolders();
-      console.log(response, "fetch folders");
-      
-      setFolders(response?.folders);
-    };
     fetchFolders();
-  }, []);
+  }, [folders.length]);
 
   const createFolder = async () => {
+    const folderExists = folders.some(folder => folder.name === newFolderName);
+    if (folderExists) {
+      alert('Folder already exists. Try to create a new one.');
+      return;
+    }
     const response = await sellItemService.createFolder({ name: newFolderName });
-    console.log(response, "create folder");
-    
     setFolders([...folders, response?.data?.folder]);
     setNewFolderName('');
   };

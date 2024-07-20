@@ -94,6 +94,8 @@ function ChatFooter({
 
   const closeMedia = () => {
     setShowDialog(false);
+    setPrice(0);
+    setIsFree(true);
   }
   const handleSendMedia = async (dataFiles: any) => {
     if (dataFiles && dataFiles.length > 3) {

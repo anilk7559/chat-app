@@ -67,9 +67,8 @@ function ContactFooter({
   };
 
   const fetchData  = async ()=> {
-    const resp2 = await sellItemService.getModelSellItems({ page: 1, mediaType: 'photo', take: 9 });
+    const resp2 = await sellItemService.getModelSellItems({ page: 1, mediaType: 'photo', take: 9, modelId: contact._id });
     setPhotoFolders(resp2?.data?.folders);
-    console.log(resp2.data, "response 4444444");
   }
 
   useEffect(() => {
@@ -133,7 +132,7 @@ function ContactFooter({
                 {selectedFolderId === folder._id && (
                   folder.sellItems.length > 0 ? (
                     folder.sellItems.map((item, indx) => (
-                      <Col xs={6} sm={3} md={3} xxl={4} className="responsive-width" key={item._id}>
+                      <Col xs={6} sm={3} md={3} lg={4} className="responsive-width" key={item._id}>
                         <div className={item.isPurchased || item.free ? 'image-box mt-3 active' : 'image-box mt-3'}>
                           <img
                             alt=""
