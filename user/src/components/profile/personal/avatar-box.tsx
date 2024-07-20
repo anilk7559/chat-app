@@ -11,6 +11,7 @@ interface IProps {
 function AvatarComponent({ avatarUrl, onUploadAvatarComplete }: IProps) {
   const { publicRuntimeConfig: config } = getConfig();
   const [modalShow, setModalShow] = useState(false);
+  const ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT || 'https://chat-app-eaxp.onrender.com/v1';
 
   const onComplete = (resp: any) => {
     if (resp?.data?.url) {
@@ -35,7 +36,7 @@ function AvatarComponent({ avatarUrl, onUploadAvatarComplete }: IProps) {
         </a>
       </div>
       <ModalUpload
-        url={`${process.env.NEXT_PUBLIC_API_ENDPOINT}/users/avatar`}
+        url={`${ENDPOINT}/users/avatar`}
         onCompleteFile={onComplete}
         key="modal-upload"
         modalShow={modalShow}
