@@ -9,7 +9,7 @@ class MyDocument extends Document {
     const initialProps = await Document.getInitialProps(ctx);
     try {
       const { publicRuntimeConfig } = getConfig();
-      const resp = await fetch(`${publicRuntimeConfig.API_ENDPOINT}/system/configs/keys`, {
+      const resp = await fetch(`${publicRuntimeConfig.NEXT_PUBLIC_API_ENDPOINT}/system/configs/keys`, {
         method: 'post',
         headers: {
           'Content-Type': 'application/json'

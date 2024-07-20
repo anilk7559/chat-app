@@ -15,7 +15,7 @@ module.exports = {
   swcMinify: true,
   serverRuntimeConfig: {
     // Will only be available on the server side
-    API_ENDPOINT: process.env.API_SERVER_ENDPOINT || process.env.API_ENDPOINT
+    API_ENDPOINT: process.env.NEXT_PUBLIC_API_SERVER_ENDPOINT || process.env.API_ENDPOINT
   },
   publicRuntimeConfig: {
     // Will be available on both server and client

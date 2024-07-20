@@ -34,33 +34,42 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 function ModelList({
   authUser
 }: PropsFromRedux) {
-  const {t} = useTranslationContext();
-
-  const pageSize = 12;
-  const router = useRouter();
+  const { t } = useTranslationContext();
+  const [userType, setUserType] = useState('');
   const [loading, setLoading] = useState(true);
   const [showLocation, setShowLocation] = useState(false);
   const [data, setData] = useState({
     items: [],
     count: 0
   });
+  const pageSize = 12;
   const [query, setQuery] = useState({
     page: 1,
-    take: pageSize,
-    type: 'model',
+    take: 12,
+    type: authUser.type === 'model' ? 'user' : 'model',
     gender: undefined,
     country: undefined,
     state: undefined,
     city: undefined
   });
-  const formRef = useRef<any>();
+  const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+      const updatedQuery = {
+        ...query,
+        type: authUser.type ==='model'? 'user' :'model',
+      };
+      setQuery(updatedQuery);
+      search(updatedQuery);
+  }, [authUser]);
 
   const search = async (newQuery = {}) => {
     setLoading(true);
     const requestQuery = {
       ...query,
       ...newQuery
-    } as any;
+    };
     const { friendOnly } = router.query;
     const resp = friendOnly
       ? await userService.getFriends({
@@ -131,8 +140,10 @@ function ModelList({
   const pageTitle = friendOnly ? 'Favoriten' : 'Alle Modelle';
 
   useEffect(() => {
-    search({ username: '' });
-    formRef.current.resetForm();
+      search({ username: '' });
+      if (formRef.current) {
+        formRef?.current?.resetForm();
+      }
   }, [router]);
 
   return (

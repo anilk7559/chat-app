@@ -1,12 +1,14 @@
 import ChatButton from '@components/conversation/chat-button';
 import { contactService } from '@services/contact.service';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 
 // Action
 import SendTipButton from '../send-tip-button';
+import Link from 'next/link';
+import { useTranslationContext } from 'context/TranslationContext';
 
 interface IProps {
   contact: any;
@@ -24,6 +26,13 @@ function ContactHeader({
   contact
 }: IProps) {
   const router = useRouter();
+  const {setModelId} = useTranslationContext();
+
+  useEffect(() => {
+    if (authUser.type === 'model') {
+      setModelId(contact._id);
+    }
+  })
 
   // const isFriend = React.useRef<boolean>(contact.isFriend);
   const [isFriend, setIsFriend] = useState(contact.isFriend);
@@ -89,6 +98,7 @@ function ContactHeader({
               <div className="text-center">
                 {authUser.type === 'user' && contact?.type === 'model' && <SendTipButton model={contact} />}
                 <ChatButton isFriend={isFriend} user={contact} />
+                {authUser.type === 'user' && <Link className="btn btn-primary btn-sm" href={`/blogs/allblogs/${contact._id}`}>Blogs</Link>}
               </div>
               <div>
                 (

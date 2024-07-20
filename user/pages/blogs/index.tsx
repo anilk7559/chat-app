@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
+import { withAuth } from '@redux/withAuth';
 import { sellItemService } from '@services/sell-item.service';
 import {
   Field, Formik, FormikHelpers, FormikProps
@@ -7,6 +8,7 @@ import getConfig from 'next/config';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Button, Form, FormControl } from 'react-bootstrap';
+import { connect, ConnectedProps } from 'react-redux';
 import { toast } from 'react-toastify';
 import Upload from 'src/components/upload/Upload';
 import * as Yup from 'yup';
@@ -27,13 +29,21 @@ const schema = Yup.object().shape({
   mediaType: Yup.string().required('Type is Required'),
 });
 
+const mapStates = (state: any) => ({
+  authUser: state.auth.authUser
+});
+
+const connector = connect(mapStates);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
 function Blogs() {
   const [fileUpload, setFileUpload] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
-  const API_SERVER_ENDPOINT: string = 'https://chat-app-eaxp.onrender.com/v1';
+  const ENDPOINT: string = process.env.API_ENDPOINT || 'https://chat-app-eaxp.onrender.com/v1';
   // const { publicRuntimeConfig: config } = getConfig();
   const [mediaId, setMediaId] = useState('');
-  const [url, setUrl] = useState(`${API_SERVER_ENDPOINT}/media/photos`);
+  const [url, setUrl] = useState(`${ENDPOINT}/media/photos`);
   const [disabled, setDisabled] = useState(false);
   const router = useRouter();
 
@@ -180,4 +190,4 @@ function Blogs() {
   );
 }
 
-export default Blogs;
+export default withAuth(connector(Blogs));

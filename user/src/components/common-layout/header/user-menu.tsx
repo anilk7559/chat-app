@@ -1,6 +1,7 @@
 import { formatNumber } from '@lib/utils';
 import { useTranslationContext } from 'context/TranslationContext';
 import { useRouter } from 'next/router';
+import { useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 
@@ -21,6 +22,7 @@ function UserMenu({
   handleClickToMenu
 }: IProps) {
   const router = useRouter();
+  const user = useSelector((state: any) => state.auth.authUser);
   const [activeRoute, setActiveRoute] = useState(null);
   const {t} = useTranslationContext();
 
@@ -80,8 +82,8 @@ function UserMenu({
               </a>
             </Dropdown.Item>
             <Dropdown.Item
-          onClick={() => onClickMenu('/blogs/allblogs', '/blogs/allblogs')}
-          active={activeRoute === '/blogs/allblogs'}
+          onClick={() => onClickMenu(`/blogs/allblogs/${user._id}`, `/blogs/allblogs/${user._id}`)}
+          active={activeRoute === `/blogs/allblogs/${user._id}`}
         >
          {t?.dropdown?.blogs}
         </Dropdown.Item>

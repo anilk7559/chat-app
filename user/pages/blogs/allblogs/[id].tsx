@@ -1,19 +1,31 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import Loader from '@components/common-layout/loader/loader';
 import { sellItemService } from '@services/sell-item.service';
+import { useTranslationContext } from 'context/TranslationContext';
 import getConfig from 'next/config';
 import Link from 'next/link';
+import { withAuth } from '@redux/withAuth';
 
-import Router from 'next/router';
+
+import Router, { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
+import { ConnectedProps, connect } from 'react-redux';
 
+const mapStates = (state: any) => ({
+  authUser: state.auth.authUser
+});
 
+const connector = connect(mapStates);
 
-function Blogs() {
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+function Blogs({ authUser }: PropsFromRedux) {
   // const { publicRuntimeConfig: config } = getConfig();
     const [blogPosts, setBlogPosts] = useState([]);
-    const userId = '6683cce9a5e475a6ac5c0731'; // Replace this with the actual user ID as needed
+    const {modelId} = useTranslationContext();
+    const {id} = useRouter().query;
+    const userId = id;
   
     const fetchAllBlogs = async () => {
         try {
@@ -31,11 +43,11 @@ function Blogs() {
     return (
       <div className='m-4'>
         <h1 style={{color: '#ff337c', fontWeight: 'medium', fontStyle: 'italic'}}>Blogs</h1>
-        <Col md={12} className="flex justify-content-end mb-2">
+         { authUser?.type === 'model' && <Col md={12} className="flex justify-content-end mb-2">
               <Button onClick={() => Router.push('/blogs', '/blogs', { shallow: true })} className="btn btn-primary">
               Create Blog Posts
               </Button>
-            </Col>
+            </Col>}
         <Row>
           {blogPosts.length === 0 && (
            <div style={{ textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }} className="w-full"> <Loader containerStyle="text-center" size="40px" /></div>
@@ -67,4 +79,4 @@ function Blogs() {
     );
   }
 
-  export default Blogs;
+  export default withAuth(connector(Blogs));
