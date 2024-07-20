@@ -43,14 +43,6 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
     type: 'user'
   };
 
-  const getImageClass = (item: any,) => {
-    if((item?.sellItemId && item?.isPurchased === true) || (item?.sellItemId === false)){
-      return 'active';
-    } else {
-      return '';
-    }
-  };
-
   const handlePurchase = (item: any) => {
     if (authUser.type === 'model') {
       toast.error('Es tut uns leid. Nur Benutzer können Premium-Inhalte erwerben.');
@@ -71,17 +63,6 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
     setUserType(userType);
   }, []);
 
-  const item = {
-    _id: '',
-    fileUrl: '',
-    thumbUrl: '',
-    isPurchased: false
-  };
-
-  useEffect(() => {
-    getImageClass(item);
-  }, [items?.length]);
-
   return (
     <>
       <div className="form-row">
@@ -100,7 +81,7 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
             {userType === 'model' || item.isFree === true || item.sellItemId === null ? (
               <img alt="media_thumb" src={item?.thumbUrl} />
             ) : 
-              <div className={item && item.isPurchased === true && item.isFree === false ? `image-box mt-3 ${getImageClass(item)}` : 'image-box mt-3'}>
+              <div className={item && item.isPurchased === true && item.isFree === false ? 'image-box mt-3 active' : 'image-box mt-3'}>
                 <img 
                   onClick={() => {
                     if (download) {
@@ -151,4 +132,3 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
 }
 
 export default MediaContent;
-
