@@ -2,7 +2,7 @@ import { purchaseItem } from '@redux/purchase-item/actions';
 import { mediaService } from '@services/media.service';
 import { useEffect, useState } from 'react';
 import { NumericFormat } from 'react-number-format';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import ImageBox from 'src/components/conversation/image-box';
 
@@ -12,26 +12,17 @@ interface IProps {
   download?: boolean;
   sender?: {
     type: string;
-  }
+  };
 }
 
 function MediaContent({ items, type, sender, download = true }: IProps) {
   const [activeImage, setActiveImage] = useState('');
   const dispatch = useDispatch();
-  const [userType, setUserType] = useState('');
+  const authUser = useSelector((state: any) => state.auth.authUser);
   const [mediaItems, setMediaItems] = useState(items);
 
-  useEffect(() => {
-    const userTypeFromStorage = JSON.parse(localStorage.getItem('userType') || '');
-    setUserType(userTypeFromStorage);
-  }, []);
-
-  useEffect(() => {
-    setMediaItems(items);
-  }, [items]);
-
   const handleDownloadFile = async (mediaId: string, item: any) => {
-    if ((item.sellItemId && item.isPurchased === true) || (item.sellItemId === false)) {
+    if ((item.sellItemId && item.isPurchased === true) || item.sellItemId === false) {
       try {
         const resp = await mediaService.download(mediaId);
         const a = document.createElement('a');
@@ -48,12 +39,12 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
   };
 
   const handlePurchase = (item: any) => {
-    if (userType === 'model') {
+    if (authUser.type === 'model') {
       toast.error('Es tut uns leid. Nur Benutzer können Premium-Inhalte erwerben.');
     } else if (window.confirm('Sind Sie sicher, dass Sie dieses Element kaufen möchten?')) {
       dispatch(purchaseItem({ sellItemId: item.sellItemId }))
         .then(() => {
-          const updatedItems = mediaItems.map(mediaItem => {
+          const updatedItems = mediaItems.map((mediaItem) => {
             if (mediaItem._id === item._id) {
               return { ...mediaItem, isPurchased: true };
             }
@@ -66,6 +57,20 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
         });
     }
   };
+
+  useEffect(() => {
+    // Ensure that the new items have correct isPurchased and blur state
+    const updatedItems = items.map((item) => {
+      if (authUser.type === 'user' && item.sellItemId && !item.isPurchased) {
+        return {
+          ...item,
+          isPurchased: false, // Initially set isPurchased to false for paid items
+        };
+      }
+      return item;
+    });
+    setMediaItems(updatedItems);
+  }, [items, authUser.type]);
 
   return (
     <>
@@ -82,7 +87,7 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
                 setActiveImage(`${item?.fileUrl}`);
               }}
             >
-              {userType === 'model' || item.isFree === true || item.sellItemId === null ? (
+              {authUser.type === 'model' || item.isFree === true || item.sellItemId === null ? (
                 <img alt="media_thumb" src={item?.thumbUrl} />
               ) : (
                 <div className={item.isPurchased === true && item.isFree === false ? 'image-box mt-3 active' : 'image-box mt-3'}>
@@ -117,7 +122,6 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
                   <div className="overlay" />
                 </div>
               )}
-              {/* type = video */}
               {type === 'video' && (
                 <video controls src={`${item?.fileUrl}`} width="100%" />
               )}
