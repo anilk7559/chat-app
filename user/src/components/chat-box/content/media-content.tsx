@@ -2,7 +2,7 @@ import { purchaseItem } from '@redux/purchase-item/actions';
 import { mediaService } from '@services/media.service';
 import { useEffect, useState } from 'react';
 import { NumericFormat } from 'react-number-format';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import ImageBox from 'src/components/conversation/image-box';
 
@@ -12,17 +12,17 @@ interface IProps {
   download?: boolean;
   sender?: {
     type: string;
-  };
+  }
 }
 
 function MediaContent({ items, type, sender, download = true }: IProps) {
   const [activeImage, setActiveImage] = useState('');
   const dispatch = useDispatch();
-  const authUser = useSelector((state: any) => state.auth.authUser);
+  const [userType, setUserType] = useState('');
   const [mediaItems, setMediaItems] = useState(items);
 
   const handleDownloadFile = async (mediaId: string, item: any) => {
-    if ((item.sellItemId && item.isPurchased === true) || item.sellItemId === false) {
+    if((item.sellItemId && item.isPurchased === true) || (item.sellItemId === false)){
       try {
         const resp = await mediaService.download(mediaId);
         const a = document.createElement('a');
@@ -33,8 +33,21 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
         const error = await e;
         toast.error(error?.message || 'Datei konnte nicht heruntergeladen werden!');
       }
-    } else {
+    } 
+     else{
       toast.error('Sie sind nicht berechtigt, diese Inhalte zu erwerben.');
+    }
+  };
+
+  let authUser = {
+    type: 'user'
+  };
+
+  const getImageClass = (item: any,) => {
+    if((item?.sellItemId && item?.isPurchased === true) || (item?.sellItemId === false)){
+      return 'active';
+    } else {
+      return '';
     }
   };
 
@@ -43,34 +56,31 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
       toast.error('Es tut uns leid. Nur Benutzer können Premium-Inhalte erwerben.');
     } else if (window.confirm('Sind Sie sicher, dass Sie dieses Element kaufen möchten?')) {
       dispatch(purchaseItem({ sellItemId: item.sellItemId }))
-        .then(() => {
-          const updatedItems = mediaItems.map((mediaItem) => {
-            if (mediaItem._id === item._id) {
-              return { ...mediaItem, isPurchased: true };
-            }
-            return mediaItem;
-          });
-          setMediaItems(updatedItems);
-        })
-        .catch(() => {
-          toast.error('Der Kauf ist fehlgeschlagen.');
-        });
+      const updatedItems = mediaItems.map(mediaItem => {
+        if (mediaItem._id === item._id) {
+          return { ...mediaItem, isPurchased: true };
+        }
+        return mediaItem;
+      });
+      setMediaItems(updatedItems);
     }
   };
 
+  useEffect(()=> {
+    const userType = JSON.parse(localStorage.getItem('userType') || '');
+    setUserType(userType);
+  }, []);
+
+  const item = {
+    _id: '',
+    fileUrl: '',
+    thumbUrl: '',
+    isPurchased: false
+  };
+
   useEffect(() => {
-    // Ensure that the new items have correct isPurchased and blur state
-    const updatedItems = items.map((item) => {
-      if (authUser.type === 'user' && item.sellItemId && !item.isPurchased) {
-        return {
-          ...item,
-          isPurchased: false, // Initially set isPurchased to false for paid items
-        };
-      }
-      return item;
-    });
-    setMediaItems(updatedItems);
-  }, [items, authUser.type]);
+    getImageClass(item);
+  }, [items?.length]);
 
   return (
     <>
@@ -86,44 +96,49 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
                 }
                 setActiveImage(`${item?.fileUrl}`);
               }}
-            >
-              {authUser.type === 'model' || item.isFree === true || item.sellItemId === null ? (
-                <img alt="media_thumb" src={item?.thumbUrl} />
-              ) : (
-                <div className={item.isPurchased === true && item.isFree === false ? 'image-box mt-3 active' : 'image-box mt-3'}>
-                  <img
-                    onClick={() => {
-                      if (download) {
-                        handleDownloadFile(item._id, item);
-                      }
-                    }}
-                    alt=""
-                    className="img-fluid rounded"
-                    src={item.isPurchased === true && item.isFree === false ? item?.thumbUrl || '/images/default_thumbnail_photo.jpg' : item.media?.blurUrl || '/images/default_thumbnail_photo.jpg'}
-                  />
-                  <h5>
-                    {item.isPurchased === true && item.isFree === false ? (
-                      <span>
-                        <i className="far fa-eye" /> Vorschau
-                      </span>
-                    ) : (
-                      <span>
-                        <NumericFormat thousandSeparator value={item.price} displayType="text" /> Tokens
-                      </span>
-                    )}
-                  </h5>
-                  {<a
-                    aria-hidden
-                    className="btn btn-primary pointer"
-                    onClick={() => handlePurchase(item)}
-                  >
-                    Jetzt kaufen
-                  </a>}
-                  <div className="overlay" />
-                </div>
-              )}
+            > 
+            {userType === 'model' || item.isFree === true || item.sellItemId === null ? (
+              <img alt="media_thumb" src={item?.thumbUrl} />
+            ) : 
+              <div className={item && item.isPurchased === true && item.isFree === false ? `image-box mt-3 ${getImageClass(item)}` : 'image-box mt-3'}>
+                <img 
+                  onClick={() => {
+                    if (download) {
+                      handleDownloadFile(item._id, item);
+                    }
+                  }} 
+                  alt=""  
+                  className={`img-fluid rounded`} 
+                  src={item && item.isPurchased === true && item.isFree === false ? item?.thumbUrl || '/images/default_thumbnail_photo.jpg' : item.media?.blurUrl || '/images/default_thumbnail_photo.jpg'} 
+                />
+                <h5>
+                  {item && item.isPurchased === true && item.isFree === false ? (
+                    <span>
+                      <i className="far fa-eye" />
+                      {' '}
+                      Vorschau
+                    </span>
+                  ) : (
+                    <span>
+                      <NumericFormat thousandSeparator value={item.price} displayType="text" />
+                      {' '}
+                      Tokens
+                    </span>
+                  )}
+                </h5>
+                { <a
+                  aria-hidden
+                  className="btn btn-primary pointer"
+                  onClick={() => handlePurchase(item)}
+                >
+                  Jetzt kaufen
+                </a>}
+                <div className="overlay" />
+              </div>
+            }
+              {/* type = video */}
               {type === 'video' && (
-                <video controls src={`${item?.fileUrl}`} width="100%" />
+              <video controls src={`${item?.fileUrl}`} width="100%" />
               )}
             </a>
           </div>
@@ -136,3 +151,4 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
 }
 
 export default MediaContent;
+
