@@ -127,7 +127,11 @@ class Upload extends Component<IProps, any> {
       }
 
       req.responseType = 'json';
-      req.open('POST', this.props.url);
+          // Dynamically set the URL based on the file type
+    const isVideo = file.type.startsWith('video/');
+    const mediaType = isVideo ? 'videos' : 'photos';
+    const url = `${process.env.NEXT_PUBLIC_API_SERVER_ENDPOINT}/media/${mediaType}`;
+      req.open('POST', url);  // this url is causing issue
 
       const accessToken = authService.getToken() || '';
       if (accessToken) {
