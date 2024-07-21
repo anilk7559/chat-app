@@ -187,7 +187,7 @@ function MediaContent({
         <Tabs defaultActiveKey="photo" transition={false} id="tab-media-content" onSelect={(key: any) => onChangeTab(key)}>
         <Tab eventKey="photo" title={`Fotos (${totalPhoto})`}>
   {loading && <Loading />}
-  {!loading && itemsPhoto?.length > 0 ? (
+  {!loading && videoFolders?.length > 0 ? (
     <Row className=''>
       {photoFolders?.map((folder: any, index: any) => (
         <article key={folder._id + index} style={{ width: selectedFolderId === folder._id ? '100%' : '30%' }}>

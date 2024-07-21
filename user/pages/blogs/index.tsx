@@ -37,7 +37,7 @@ const connector = connect(mapStates);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-function Blogs() {
+function Blogs({ authUser }: PropsFromRedux) {
   const [fileUpload, setFileUpload] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
   const ENDPOINT: string = process.env.API_ENDPOINT || 'https://chat-app-eaxp.onrender.com/v1';
@@ -46,10 +46,6 @@ function Blogs() {
   const [url, setUrl] = useState(`${ENDPOINT}/media/photos`);
   const [disabled, setDisabled] = useState(false);
   const router = useRouter();
-
-
-
-
 
   const onCompleteFile = (resp) => {
     setMediaId(resp.data.id);
@@ -71,7 +67,7 @@ function Blogs() {
         mediaId,
       });
       toast.success('Medieninhalt wurde erfolgreich hochgeladen. Bitte warten Sie auf die Genehmigung durch den Administrator.');
-      setTimeout(() => router.push('/blogs/allblogs'), 3000);
+      setTimeout(() => router.push(`/blogs/allblogs/${authUser?._id}`), 3000);
     } catch (e) {
       setDisabled(false);
       const err = await e;
