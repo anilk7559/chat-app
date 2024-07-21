@@ -127,12 +127,7 @@ class Upload extends Component<IProps, any> {
       }
 
       req.responseType = 'json';
-          // Dynamically set the URL based on the file type
-    const isVideo = file.type.startsWith('video/');
-    const mediaType = isVideo ? 'videos' : 'photos';
-    const url = `https://chat-app-eaxp.onrender.com/v1/media/${mediaType}`;
-      req.open('POST', url);  // this url is causing issue
-
+      req.open('POST', this.props.url);
       const accessToken = authService.getToken() || '';
       if (accessToken) {
         req.setRequestHeader('Authorization', `Bearer ${accessToken}`);
