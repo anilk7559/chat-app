@@ -32,7 +32,9 @@ class SellItemService extends APIRequest {
   getMyPendingItem(data: IGetSellItem) {
     return this.get('/pending-item/me', data as any);
   }
-
+  getMyPendingVideoItem(data: IGetSellItem) {
+    return this.get('/pending-videoItem/me', data as any);
+  }
   updateSellItem(id: string, data: any) {
     return this.put(`/sell-item/${id}`, data);
   }

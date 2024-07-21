@@ -1,12 +1,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import Loader from '@components/common-layout/loader/loader';
 import { sellItemService } from '@services/sell-item.service';
-import { useTranslationContext } from 'context/TranslationContext';
-import getConfig from 'next/config';
 import Link from 'next/link';
 import { withAuth } from '@redux/withAuth';
-
-
 import Router, { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
@@ -23,7 +19,6 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 function Blogs({ authUser }: PropsFromRedux) {
   // const { publicRuntimeConfig: config } = getConfig();
     const [blogPosts, setBlogPosts] = useState([]);
-    const {modelId} = useTranslationContext();
     const {id} = useRouter().query;
     const userId = id;
   

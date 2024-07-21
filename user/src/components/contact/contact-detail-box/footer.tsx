@@ -39,12 +39,13 @@ function ContactFooter({
   }
 }: IProps) {
   const [page, setPage] = useState(1);
-  const [type, setType] = useState('Foto');
+  const [type, setType] = useState('video');
   const [isOpenMedia, setIsOpenMedia] = useState(false);
   const [mediaItem, setMediaItem] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [titleModal, setTitleModal] = useState('');
   const [photoFolders, setPhotoFolders] = useState([]);
+  const [videoFolders, setVideoFolders] = useState([]);
   const take = 8;
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
 
@@ -70,10 +71,15 @@ function ContactFooter({
     const resp2 = await sellItemService.getModelSellItems({ page: 1, mediaType: 'photo', take: 9, modelId: contact._id });
     setPhotoFolders(resp2?.data?.folders);
   }
+  const fetchVideoData  = async ()=> {
+    const resp2 = await sellItemService.getModelSellItems({ page: 1, mediaType: 'video', take: 9, modelId: contact._id });
+    setVideoFolders(resp2?.data?.folders);
+  }
 
   useEffect(() => {
     gettSellItemRequesting();
     fetchData()
+    fetchVideoData()
   }, [getSellItemStore.requesting]);
 
   useEffect(() => {
@@ -104,102 +110,127 @@ function ContactFooter({
   return (
     <div className="tab-box">
       <Tabs defaultActiveKey="photo" transition={false} id="tab-sell-item" onSelect={(key: any) => setType(key)}>
-        <Tab eventKey="photo" title="Fotos">
-          {isLoading && <Loader />}
-          {!isLoading && items && items.length > 0 && (
-            <Row>
-            {photoFolders?.map((folder, index) => (
-              <Row className="min-h" key={index}>
-                <Col xs={12}>
-                  <section
-                    onClick={() => handleFolderClick(folder._id)}
-                    style={{ cursor: 'pointer', margin: '10px', border: selectedFolderId === folder._id ? '' : '1px solid #eee', display: selectedFolderId && selectedFolderId !== folder._id ? 'none' : 'block' }}
-                    className='image-box mt-1 mb-1 active'
-                  >
-                    <img
-                      style={{ display: selectedFolderId === folder._id ? 'none' : 'block', objectFit: 'cover' }}
-                      src={folder?.sellItems?.[0]?.media?.thumbUrl || '/images/default_thumbnail_photo.jpg'}
-                      alt="media_thumb_photo"
-                    />
-                    <button
-                      style={{ width: '100%', height: '100%', backgroundColor: '#FF337C', color: 'white', border: 'none', padding: '10px' }}
-                      className=''
-                    >
-                      {selectedFolderId === folder._id ? "Go back" : folder.name}
-                    </button>
-                  </section>
-                </Col>
-                {selectedFolderId === folder._id && (
-                  folder.sellItems.length > 0 ? (
-                    folder.sellItems.map((item, indx) => (
-                      <Col xs={6} sm={3} md={3} lg={4} className="responsive-width" key={item._id}>
-                        <div className={item.isPurchased || item.free ? 'image-box mt-3 active' : 'image-box mt-3'}>
-                          <img
-                            alt=""
-                            src={item.isPurchased || item.free ? item.media?.thumbUrl || '/images/default_thumbnail_photo.jpg' : item.media?.blurUrl || '/images/default_thumbnail_photo.jpg'}
-                          />
-                          <h5>
-                            {item.isPurchased || item.free ? (
-                              <span>
-                                <i className="far fa-eye" />
-                                {' '}
-                                Vorschau
-                              </span>
-                            ) : (
-                              <span>
-                                <NumericFormat thousandSeparator value={item.price} displayType="text" />
-                                {' '}
-                                Tokens
-                              </span>
-                            )}
-                          </h5>
-                            <a
-                              aria-hidden
-                              className="btn btn-primary pointer"
-                              onClick={() => (isFriend ? handlePurchase(item) : toast.error('Bitte fügen Sie das Modell zu Ihren Favoriten hinzu, um den Artikel zu kaufen.'))}
-                            >
-                              Jetzt kaufen
-                            </a>
-                          <a
-                            aria-hidden
-                            className="popup"
-                            role="button"
-                            onClick={(e) => handleView(e, item)}
-                            style={{ cursor: `${item.isPurchased || item.free ? 'pointer' : 'unset'}` } as any}
-                          >
-                            {}
-                          </a>
-                          <div className="overlay" />
-                        </div>
-                        {/* <div className="media-name" data-toggle="tooltip" data-placement="top" title={item.name}>
-                          {item.name}
-                        </div> */}
-                      </Col>
-                    ))
-                  ) : (
-                    <Col>
-                      <p className="text-alert-danger">Sie haben kein Foto verfügbar!</p>
-                    </Col>
-                  )
-                )}
-              </Row>
-            ))}
-          </Row>
+      <Tab eventKey="photo" title="Fotos">
+  {isLoading && <Loader />}
+  {!isLoading && items && items.length > 0 && (
+    <Row>
+      {photoFolders?.filter(folder => folder.sellItems.length > 0).map((folder, index) => (
+        <Row className="min-h" key={index}>
+          <Col xs={12}>
+            <section
+              onClick={() => handleFolderClick(folder._id)}
+              style={{ cursor: 'pointer', margin: '10px', border: selectedFolderId === folder._id ? '' : '1px solid #eee', display: selectedFolderId && selectedFolderId !== folder._id ? 'none' : 'block' }}
+              className='image-box mt-1 mb-1 active'
+            >
+              <img
+                style={{ display: selectedFolderId === folder._id ? 'none' : 'block', objectFit: 'cover', width: '100%', height: '13vw' }}
+                src={folder?.sellItems?.[0]?.media?.thumbUrl || '/images/default_thumbnail_photo.jpg'}
+                alt="media_thumb_photo"
+              />
+              <button
+                style={{ width: '100%', height: '100%', maxWidth: '20vw', backgroundColor: '#FF337C', color: 'white', border: 'none', padding: '10px' }}
+                className=''
+              >
+                {selectedFolderId === folder._id ? "Go back" : folder.name}
+              </button>
+            </section>
+          </Col>
+          {selectedFolderId === folder._id && (
+            folder.sellItems.length > 0 ? (
+              folder.sellItems.map((item, indx) => (
+                <article key={folder._id + indx} style={{ width: selectedFolderId === folder._id ? '50vw' : '30%' }}>
+                  <Col xs={6} sm={3} md={3} lg={4} className="responsive-width" key={item._id}>
+                    <div className={item.isPurchased || item.free ? 'image-box mt-3 active' : 'image-box mt-3'}>
+                      <img
+                        alt=""
+                        src={item.isPurchased || item.free ? item.media?.thumbUrl || '/images/default_thumbnail_photo.jpg' : item.media?.blurUrl || '/images/default_thumbnail_photo.jpg'}
+                      />
+                      <h5>
+                        {item.isPurchased || item.free ? (
+                          <span>
+                            <i className="far fa-eye" />
+                            {' '}
+                            Vorschau
+                          </span>
+                        ) : (
+                          <span>
+                            <NumericFormat thousandSeparator value={item.price} displayType="text" />
+                            {' '}
+                            Tokens
+                          </span>
+                        )}
+                      </h5>
+                      <a
+                        aria-hidden
+                        className="btn btn-primary pointer"
+                        onClick={() => (isFriend ? handlePurchase(item) : toast.error('Bitte fügen Sie das Modell zu Ihren Favoriten hinzu, um den Artikel zu kaufen.'))}
+                      >
+                        Jetzt kaufen
+                      </a>
+                      <a
+                        aria-hidden
+                        className="popup"
+                        role="button"
+                        onClick={(e) => handleView(e, item)}
+                        style={{ cursor: `${item.isPurchased || item.free ? 'pointer' : 'unset'}` } as any}
+                      >
+                        {}
+                      </a>
+                      <div className="overlay" />
+                    </div>
+                  </Col>
+                </article>
+              ))
+            ) : (
+              <Col>
+                <p className="text-alert-danger">Sie haben kein Foto verfügbar!</p>
+              </Col>
+            )
           )}
-        </Tab>
-        <Tab eventKey="video" title="Videos">
-          {isLoading && <Loader />}
-          {!isLoading && items && items.length > 0 && (
+        </Row>
+      ))}
+    </Row>
+  )}
+</Tab>
 
-            <Row className="min-h">
-              {items.map((item) => (
-                <Col xs={6} sm={3} md={3} xxl={4} className="responsive-width" key={item._id}>
+        <Tab eventKey="videos" title={`Videos`}>
+  {isLoading && <Loader />}
+  {!isLoading && videoFolders.length > 0 && (
+    <Row>
+    {videoFolders?.filter(folder => folder.sellItems.length > 0).map((folder, index) => (
+      <Row className="min-h" key={index}>
+        <Col xs={12}>
+          <section
+            onClick={() => handleFolderClick(folder._id)}
+            style={{ cursor: 'pointer', width: '100%', maxWidth: '10vw', margin: '10px', border: selectedFolderId === folder._id ? '' : '1px solid #eee', display: selectedFolderId && selectedFolderId !== folder._id ? 'none' : 'block' }}
+            className='image-box mt-1 mb-1 active'
+          >
+            <video
+              style={{ display: selectedFolderId === folder._id ? 'none' : 'block', objectFit: 'cover', width: '100%', height: '13vw' }}
+              src={folder?.sellItems?.[0]?.media?.fileUrl || '/images/default_thumbnail_video.png'}
+            />
+            <button
+              style={{ width: '100%', height: '100%', maxWidth: '20vw', backgroundColor: '#FF337C', color: 'white', border: 'none', padding: '10px' }}
+              className=''
+            >
+              {selectedFolderId === folder._id ? "Go back" : folder.name}
+            </button>
+          </section>
+        </Col>
+        {selectedFolderId === folder._id && (
+          folder.sellItems.length > 0 ? (
+            folder.sellItems.map((item, indx) => (
+              <article key={folder._id + indx} style={{ width: selectedFolderId === folder._id ? '50vw' : '30%' }}>
+                <Col xs={6} sm={3} md={3} lg={4} className="responsive-width" key={item._id}>
                   <div className={item.isPurchased || item.free ? 'image-box mt-3 active' : 'image-box mt-3'}>
-                    <img alt="" src={item?.media?.thumbUrl || '/images/default_thumbnail_video.png'} />
+                    <video
+                      controls style={{ objectFit: 'cover', width: '100%', height: '13vw' }}
+                      src={item.isPurchased || item.free ? item.media?.fileUrl || '/images/default_thumbnail_video.png' : item.media?.blurUrl || '/images/default_thumbnail_video.png'}
+                    />
                     <h5>
                       {item.isPurchased || item.free ? (
                         <span>
-                          <i className={`far fa-eye ${item.isPurchased || item.free ? 'mt-3' : ''}`} />
+                          <i className="far fa-eye" />
                           {' '}
                           Vorschau
                         </span>
@@ -212,9 +243,9 @@ function ContactFooter({
                       )}
                     </h5>
                     <a
-                      href="#"
-                      className="btn btn-primary"
-                      onClick={() => (isFriend ? handlePurchase(item) : toast.error('Bitte fügen Sie das Modell zu Ihren Favoriten hinzu, um den Artikel zu kaufen'))}
+                      aria-hidden
+                      className="btn btn-primary pointer"
+                      onClick={() => (isFriend ? handlePurchase(item) : toast.error('Bitte fügen Sie das Modell zu Ihren Favoriten hinzu, um den Artikel zu kaufen.'))}
                     >
                       Jetzt kaufen
                     </a>
@@ -231,15 +262,22 @@ function ContactFooter({
                     </a>
                     <div className="overlay" />
                   </div>
-                  <div className="media-name" data-toggle="tooltip" data-placement="top" title={item.name}>
-                    {item.name}
-                  </div>
-
                 </Col>
-              ))}
-            </Row>
-          )}
-        </Tab>
+              </article>
+            ))
+          ) : (
+            <Col>
+              <p className="text-alert-danger">Sie haben kein Video verfügbar!</p>
+            </Col>
+          )
+        )}
+      </Row>
+    ))}
+  </Row>
+  
+  )}
+</Tab>
+
       </Tabs>
       {!isLoading && (!items || (items && items.length === 0)) && (
         <p className="text-alert-danger">

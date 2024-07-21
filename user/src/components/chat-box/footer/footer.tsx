@@ -222,8 +222,7 @@ function ChatFooter({
               <Button className="fa fa-xmark" type="button" aria-label="Close" onClick={() => closeMedia()} />
             </Modal.Header>
             <Modal.Body className=" my-0 mx-auto">
-                    <SendFile onDrop={handleSendMedia} type="media" /> <hr />
-                    <div style={{width: '100%'}} className="row mt-2">
+            <div style={{width: '100%'}} className="row mt-2">
                     <Modal.Body>
                     <Form.Check
                       type="checkbox"
@@ -244,6 +243,11 @@ function ChatFooter({
                       onChange={(e) => setPrice(parseFloat(e.target.value))}
                     />
                     <p></p>
+                    </Modal.Body>
+                          </div>
+                          <hr />
+                    <SendFile onDrop={handleSendMedia} type="media" /> 
+                    <br /> <br />
                     <Button
                         type="submit"
                         variant="primary"
@@ -253,8 +257,6 @@ function ChatFooter({
                       >
                         Upload
                       </Button>
-                    </Modal.Body>
-                          </div>
             </Modal.Body>
           </Modal>}
         {userType === 'model'?  <div style={{cursor: 'pointer'}} onClick={()=> setShowDialog(true)} className="row ml-4">

@@ -28,8 +28,11 @@ function MediaContent({
   const [loading, setLoading] = useState(false);
   const take = 9;
   const [photoFolders, setPhotoFolders] = useState([])
+  const [videoFolders, setVideoFolders] = useState([])
   const [pendingPhotos, setPendingPhotos] = useState([]);
   const [pendingPhotoFolders, setPendingPhotoFolders] = useState([])
+  const [pendingVideoItems, setPendingVideoItems] = useState([]);
+  const [pendingVideoFolders, setPendingVideoFolders] = useState([])
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
 
 
@@ -61,13 +64,28 @@ function MediaContent({
       setLoading(false);
     }
   };
+  const getPendingItemVideo = async () => {
+    try {
+      setLoading(true);
+      const resp = await sellItemService.getMyPendingVideoItem({ page: pagePhoto, mediaType: 'video', take });
+      setPendingVideoFolders(resp?.data?.folders)
+      setPendingVideoItems(resp.data.folders[0]?.sellItems);
+      setTotalVideo(resp.data?.folders?.length);
+    } catch (e) {
+      const err = await e;
+      toast.error(err?.message || 'Das Laden meines Verkaufsartikelfotos ist fehlgeschlagen');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getSellItemVideo = async () => {
     try {
       setLoading(true);
       const resp = await sellItemService.getMySellItem({ page: pageVideo, mediaType: 'video', take });
       setItemsVideo(resp.data.folders[0]?.sellItems);
-      setTotalVideo(resp.data.count);
+      setVideoFolders(resp?.data?.folders)
+      setTotalVideo(resp.data?.folders?.length);
     } catch (e) {
       const err = await e;
       toast.error(err?.message || 'Das Laden meines Verkaufsartikelvideos ist fehlgeschlagen.');
@@ -154,6 +172,7 @@ function MediaContent({
 
   useEffect(() => {
     getSellItemVideo();
+    getPendingItemVideo();
   }, [pageVideo]);
 
   return (
@@ -224,44 +243,58 @@ function MediaContent({
   {itemsPhoto?.length > 0 && totalPhoto > 0 && totalPhoto > take && <MainPaginate currentPage={pagePhoto} pageTotal={totalPhoto} pageNumber={take} setPage={setPagePhoto} />}
         </Tab>
 
-          <Tab eventKey="video" title={`Videos (${totalVideo})`}>
-            {loading && <Loading />}
-            {!loading && itemsVideo?.length > 0
-              ? (
-                <Row>
-                  {itemsVideo?.map((item: any, index: any) => (
-                    <Col xs={6} sm={6} md={6} lg={4} key={item._id + index as any} data-toggle="tooltip" title={item.name}>
-                      <div className="image-box mt-1 mb-1 active pt-100">
-                        <img
-                          alt="media_thumb_video"
-                          className="thumb-video"
-                          src={item?.media?.originalPath || '/images/default_thumbnail_video.png'}
-                        />
-                        <h5>
-                          <i className="far fa-eye" />
-                          {' '}
-                          Vorschau
-                        </h5>
-                        <a className="edit" onClick={() => handleOpenModalUpdate(item, 'video')}>
-                          <i className="fas fa-pencil-alt" />
-                        </a>
-                        <a className="remove" onClick={() => handleRemove(item._id, 'video')}>
-                          <i className="fas fa-trash" />
-                        </a>
-                        <a href="#" className="popup" role="button" onClick={() => handleOpenMedia(item)}>{}</a>
-                        <div className="overlay" />
-                      </div>
-                      <div className="media-name">
-                        {item.name}
-                      </div>
-                    </Col>
-                  )) }
-                </Row>
-              ) : <p className="text-alert-danger">Sie haben kein Video verfügbar!</p>}
-            {itemsVideo?.length > 0 && totalVideo > 0 && totalVideo > take && <MainPaginate currentPage={pageVideo} pageTotal={totalVideo} pageNumber={take} setPage={setPageVideo} />}
-          </Tab>
+        <Tab eventKey="videos" title={`Videos (${totalVideo})`}>
+  {loading && <Loading />}
+  {!loading && videoFolders?.length > 0 ? (
+    <Row>
+      {videoFolders?.map((folder: any, index: any) => (
+        <article key={folder._id + index} style={{ width: selectedFolderId === folder._id ? '100%' : '30%' }}>
+          <section
+            onClick={() => handleFolderClick(folder._id)}
+            style={{ cursor: 'pointer', margin: '10px', border: selectedFolderId === folder._id ? '' : '1px solid #eee', display: selectedFolderId && selectedFolderId !== folder._id ? 'none' : 'block' }}
+            className='image-box mt-1 mb-1 active'
+          >
+            <video src={folder?.sellItems?.[0]?.media?.fileUrl} style={{ display: selectedFolderId === folder._id ? 'none' : 'block', objectFit: 'cover', width: '100%', height: '13vw' }} />
+            <button style={{ width: selectedFolderId === folder._id ? '20%' : '100%', height: '100%', backgroundColor: '#FF337C', color: 'white', border: 'none', padding: '10px' }}>
+              {selectedFolderId === folder._id ? "Go back" : folder.name}
+            </button>
+          </section>
 
-          <Tab eventKey="pending" title={`Pending (${pendingPhotos?.length})`}>
+          {selectedFolderId === folder._id && (
+            <Row>
+              {folder.sellItems.map((item: any, index: any) => (
+                <Col xs={12} sm={6} md={4} lg={4} key={item._id + index} data-toggle="tooltip" title={item.name}>
+                  <div className="image-box mt-1 mb-1 active">
+                    <video style={{ width: '100%', height: '13vw' }} controls src={item.media.fileUrl || '/images/default_thumbnail_video.png'} />
+                    <h5>
+                      <i className="far fa-eye" /> Vorschau
+                    </h5>
+                    <a className="edit" onClick={() => handleOpenModalUpdate(item, 'video')}>
+                      <i className="fas fa-pencil-alt" />
+                    </a>
+                    <a className="remove" onClick={() => handleRemove(item._id, 'video')}>
+                      <i className="fas fa-trash" />
+                    </a>
+                    <a href="#" className="popup" role="button" onClick={() => handleOpenMedia(item)}></a>
+                    <div className="overlay" />
+                  </div>
+                  <div className="media-name">
+                    {item.name}
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          )}
+        </article>
+      ))}
+    </Row>
+  ) : (
+    <p className="text-alert-danger">Sie haben kein Video verfügbar!</p>
+  )}
+  {itemsVideo?.length > 0 && totalVideo > 0 && totalVideo > take && <MainPaginate currentPage={pageVideo} pageTotal={totalVideo} pageNumber={take} setPage={setPageVideo} />}
+        </Tab>
+
+          <Tab eventKey="pending" title={`Pending Photos (${pendingPhotos?.length})`}>
   {loading && <Loading />}
   {!loading && pendingPhotos?.length > 0 ? (
     <Row className=''>
@@ -318,6 +351,58 @@ function MediaContent({
   )}
   {itemsPhoto?.length > 0 && totalPhoto > 0 && totalPhoto > take && <MainPaginate currentPage={pagePhoto} pageTotal={totalPhoto} pageNumber={take} setPage={setPagePhoto} />}
         </Tab>
+        {/* Video pending */}
+        <Tab eventKey="pending videos" title={`Pending Videos (${videoFolders?.length})`}>
+  {loading && <Loading />}
+  {!loading && pendingVideoItems?.length > 0 ? (
+    <Row>
+      {pendingVideoFolders?.map((folder: any, index: any) => (
+        <article key={folder._id + index} style={{ width: selectedFolderId === folder._id ? '100%' : '30%' }}>
+          <section
+            onClick={() => handleFolderClick(folder._id)}
+            style={{ cursor: 'pointer', margin: '10px', border: selectedFolderId === folder._id ? '' : '1px solid #eee', display: selectedFolderId && selectedFolderId !== folder._id ? 'none' : 'block' }}
+            className='image-box mt-1 mb-1 active'
+          >
+            <video src={folder?.sellItems?.[0]?.media?.fileUrl} style={{ display: selectedFolderId === folder._id ? 'none' : 'block', objectFit: 'cover', width: '100%', height: '13vw' }} />
+            <button style={{ width: selectedFolderId === folder._id ? '20%' : '100%', height: '100%', backgroundColor: '#FF337C', color: 'white', border: 'none', padding: '10px' }}>
+              {selectedFolderId === folder._id ? "Go back" : folder.name}
+            </button>
+          </section>
+
+          {selectedFolderId === folder._id && (
+            <Row>
+              {folder.sellItems.map((item: any, index: any) => (
+                <Col xs={12} sm={6} md={4} lg={4} key={item._id + index} data-toggle="tooltip" title={item.name}>
+                  <div className="image-box mt-1 mb-1 active">
+                    <video style={{ width: '100%', height: '13vw' }} controls src={item.media.fileUrl || '/images/default_thumbnail_video.png'} />
+                    <h5>
+                      <i className="far fa-eye" /> Vorschau
+                    </h5>
+                    <a className="edit" onClick={() => handleOpenModalUpdate(item, 'video')}>
+                      <i className="fas fa-pencil-alt" />
+                    </a>
+                    <a className="remove" onClick={() => handleRemove(item._id, 'video')}>
+                      <i className="fas fa-trash" />
+                    </a>
+                    <a href="#" className="popup" role="button" onClick={() => handleOpenMedia(item)}></a>
+                    <div className="overlay" />
+                  </div>
+                  <div className="media-name">
+                    {item.name}
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          )}
+        </article>
+      ))}
+    </Row>
+  ) : (
+    <p className="text-alert-danger">Sie haben kein Video verfügbar!</p>
+  )}
+  {itemsVideo?.length > 0 && totalVideo > 0 && totalVideo > take && <MainPaginate currentPage={pageVideo} pageTotal={totalVideo} pageNumber={take} setPage={setPageVideo} />}
+        </Tab>
+
         </Tabs>
 
       </div>

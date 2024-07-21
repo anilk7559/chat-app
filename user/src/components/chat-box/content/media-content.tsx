@@ -13,16 +13,17 @@ interface IProps {
   sender?: {
     type: string;
   }
+  messageLength?: number;
 }
 
-function MediaContent({ items, type, sender, download = true }: IProps) {
+function MediaContent({ items, type, sender, download = true, messageLength }: IProps) {
   const [activeImage, setActiveImage] = useState('');
   const dispatch = useDispatch();
   const [userType, setUserType] = useState('');
   const [mediaItems, setMediaItems] = useState(items);
 
   const handleDownloadFile = async (mediaId: string, item: any) => {
-    if((item.sellItemId && item.isPurchased === true) || (item.sellItemId === false)){
+    if ((item.sellItemId && item.isPurchased === true) || (item.sellItemId === false)) {
       try {
         const resp = await mediaService.download(mediaId);
         const a = document.createElement('a');
@@ -33,8 +34,7 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
         const error = await e;
         toast.error(error?.message || 'Datei konnte nicht heruntergeladen werden!');
       }
-    } 
-     else{
+    } else {
       toast.error('Sie sind nicht berechtigt, diese Inhalte zu erwerben.');
     }
   };
@@ -47,7 +47,7 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
     if (authUser.type === 'model') {
       toast.error('Es tut uns leid. Nur Benutzer können Premium-Inhalte erwerben.');
     } else if (window.confirm('Sind Sie sicher, dass Sie dieses Element kaufen möchten?')) {
-      dispatch(purchaseItem({ sellItemId: item.sellItemId }))
+      dispatch(purchaseItem({ sellItemId: item.sellItemId }));
       const updatedItems = mediaItems.map(mediaItem => {
         if (mediaItem._id === item._id) {
           return { ...mediaItem, isPurchased: true };
@@ -58,10 +58,26 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
     }
   };
 
-  useEffect(()=> {
+  const updateMediaClasses = () => {
+    const updatedItems = mediaItems.map(item => {
+      const isPurchased = item.isPurchased;
+      const isFree = item.isFree;
+      if (isFree || isPurchased) {
+        return { ...item, className: 'image-box mt-3 active', overlay: 'overlay',  };
+      }
+      return { ...item, className: 'image-box mt-3', overlay: '' };
+    });
+    setMediaItems(updatedItems);
+  };
+
+  useEffect(() => {
     const userType = JSON.parse(localStorage.getItem('userType') || '');
     setUserType(userType);
   }, []);
+
+  useEffect(() => {
+    updateMediaClasses();
+  }, [messageLength]);
 
   return (
     <>
@@ -78,48 +94,41 @@ function MediaContent({ items, type, sender, download = true }: IProps) {
                 setActiveImage(`${item?.fileUrl}`);
               }}
             > 
-            {userType === 'model' || item.isFree === true || item.sellItemId === null ? (
-              <img alt="media_thumb" src={item?.thumbUrl} />
-            ) : 
-              <div className={item && item.isPurchased === true && item.isFree === false ? 'image-box mt-3 active' : 'image-box mt-3'}>
-                <img 
-                  onClick={() => {
-                    if (download) {
-                      handleDownloadFile(item._id, item);
-                    }
-                  }} 
-                  alt=""  
-                  className={`img-fluid rounded`} 
-                  src={item && item.isPurchased === true && item.isFree === false ? item?.thumbUrl || '/images/default_thumbnail_photo.jpg' : item.media?.blurUrl || '/images/default_thumbnail_photo.jpg'} 
-                />
-                <h5>
-                  {item && item.isPurchased === true && item.isFree === false ? (
-                    <span>
-                      <i className="far fa-eye" />
-                      {' '}
-                      Vorschau
-                    </span>
-                  ) : (
-                    <span>
-                      <NumericFormat thousandSeparator value={item.price} displayType="text" />
-                      {' '}
-                      Tokens
-                    </span>
-                  )}
-                </h5>
-                { <a
-                  aria-hidden
-                  className="btn btn-primary pointer"
-                  onClick={() => handlePurchase(item)}
-                >
-                  Jetzt kaufen
-                </a>}
-                <div className="overlay" />
-              </div>
-            }
-              {/* type = video */}
+              {userType === 'model' || item.isFree === true || item.sellItemId === null ? (
+                <img alt="media_thumb" src={item?.thumbUrl} />
+              ) : 
+                <div className={item.className}>
+                  <img 
+                    onClick={() => {
+                      if (download) {
+                        handleDownloadFile(item._id, item);
+                      }
+                    }} 
+                    alt=""  
+                    className={`img-fluid rounded`} 
+                    src={item && item.isPurchased === true && item.isFree === false ? item?.thumbUrl || '/images/default_thumbnail_photo.jpg' : item.media?.blurUrl || '/images/default_thumbnail_photo.jpg'} 
+                  />
+                  <section>
+                    {item && item.isPurchased === false && item.isFree === true &&
+                       <span>
+                       <NumericFormat thousandSeparator value={item.price} displayType="text" />
+                       {' '}
+                       Tokens
+                     </span>}
+                  </section>
+                  <a
+                    aria-hidden
+                    className="btn btn-primary pointer"
+                    onClick={() => handlePurchase(item)}
+                  >
+                    Jetzt kaufen
+                  </a>
+                  <div className={item.overlay} />
+
+                </div>
+              }
               {type === 'video' && (
-              <video controls src={`${item?.fileUrl}`} width="100%" />
+                <video controls src={`${item?.fileUrl}`} width="100%" />
               )}
             </a>
           </div>

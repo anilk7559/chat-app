@@ -79,6 +79,13 @@ module.exports = (router) => {
     Middleware.Response.success('myPendingItem')
   );
 
+  router.get(
+    '/v1/pending-videoItem/me',
+    Middleware.isAuthenticated,
+    sellItemController.myPendingVideoItem,
+    Middleware.Response.success('myPendingVideoItem')
+  );
+
   /**
    * @apiGroup Sell Item
    * @apiVersion 1.0.0

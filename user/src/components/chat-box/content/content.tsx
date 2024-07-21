@@ -84,7 +84,6 @@ function ChatContent({ items = null, authUser = null }: IProps) {
     }
     return moment(date).format('HH:mm DD/MM/YY');
   };
-
   return (
     <>
       {/* <!-- Chat Content Start--> */}
@@ -97,7 +96,7 @@ function ChatContent({ items = null, authUser = null }: IProps) {
                 <div className={`message-content + ${message.type === 'text' && 'bg-primary-custom'}`}>
                   {message.type === 'text' && <span>{message.text}</span>}
                   {(message.type === 'photo' || message.type === 'video') && message.files && (
-                  <MediaContent sender={message.sender} type={message.type} items={message.files} download />
+                  <MediaContent messageLength={items.length} sender={message.sender} type={message.type} items={message.files} download />
                   )}
                   {message.type === 'file' && message.files && (
                   <div className="document">

@@ -204,6 +204,7 @@ exports.mySellItem = async (req, res, next) => {
     return next(e);
   }
 };
+//  /pending-videoItem/me
 
 exports.myPendingItem = async (req, res, next) => {
   const page = Math.max(0, req.query.page - 1) || 0; // using a zero-based page index for use with skip()
@@ -238,6 +239,47 @@ exports.myPendingItem = async (req, res, next) => {
    console.log(foldersWithItems, "images");
     // Response structure
     res.locals.myPendingItem = {
+      count,
+      folders: foldersWithItems,
+    };
+    return next();
+  } catch (e) {
+    return next(e);
+  }
+};
+
+exports.myPendingVideoItem = async (req, res, next) => {
+  const page = Math.max(0, req.query.page - 1) || 0; // using a zero-based page index for use with skip()
+  const take = parseInt(req.query.take, 10) || 10;
+  try {
+    if (req.user.type !== 'model') {
+      return next(PopulateResponse.forbidden());
+    }
+
+    // Fetch folders for the user
+    const folders = await Folder.find({ userId: req.user._id }).exec();
+
+    // Fetch SellItems and associated media for each folder
+    const foldersWithItems = await Promise.all(
+      folders.map(async (folder) => {
+        const sellItems = await DB.SellItem.find({
+          folderId: folder._id,
+          mediaType: req.query.mediaType,
+          isApproved: false
+        }).populate('media').sort({ createdAt: -1 }).skip(page * take).limit(take).exec();
+
+        return {
+          ...folder.toObject(),
+          sellItems,
+        };
+      })
+    );
+
+    // Flatten sell items to compute the count
+    const allSellItems = foldersWithItems.flatMap(folder => folder.sellItems);
+    const count = allSellItems.length;
+    // Response structure
+    res.locals.myPendingVideoItem = {
       count,
       folders: foldersWithItems,
     };

@@ -10,11 +10,13 @@ exports.upload = async (req, res, next) => {
     }
 
     const schema = Joi.object()
-      .keys({
-        name: Joi.string().allow('', null).optional(),
-        description: Joi.string().allow('', null).optional()
-      })
-      .unknown();
+    .keys({
+      name: Joi.string().allow('', null).optional(),
+      description: Joi.string().allow('', null).optional(),
+      price: Joi.number().allow(null).optional(), // Add necessary fields for SellItem
+      mediaType: Joi.string().allow(null).optional(),
+    })
+    .unknown();
 
     const validate = schema.validate(req.body);
     if (validate.error) {
@@ -27,7 +29,19 @@ exports.upload = async (req, res, next) => {
       file: req.file
     });
 
+    const sellItem = new DB.SellItem({
+      ownerId: req.user._id,
+      mediaId: video._id,
+      price: validate.value.price,
+      mediaType: validate.value.mediaType,
+      name: validate.value.name,
+      description: validate.value.description,
+      isApproved: false, // Set default approval status
+      createdAt: new Date()
+    });
+
     res.locals.video = video;
+    res.locals.sellItem = sellItem;
     return next();
   } catch (e) {
     return next(e);
