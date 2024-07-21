@@ -30,7 +30,7 @@ class MediaService extends APIRequest {
 
   uploadVideo(formData: FormData) {
     const baseApiEndpoint = this.getBaseApiEndpoint();
-    return fetch(`${baseApiEndpoint}/media/videos`, {
+    return fetch(`v1/media/videos`, {
       method: 'POST',
       headers: {
         Authorization: process.browser ? `Bearer ${cookie.get('accessToken')}` : ''
