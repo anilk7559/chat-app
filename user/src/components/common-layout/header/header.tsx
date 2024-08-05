@@ -36,7 +36,7 @@ function Header({
 }: PropsFromRedux) {
   const [showInviteUser, setShowInviteUser] = useState(false);
   const [activeRoute, setActiveRoute] = useState(null);
-  const {t} = useTranslationContext();
+  const {t, setCheckPaidMedia} = useTranslationContext();
 
 
   const router = useRouter();
@@ -74,6 +74,7 @@ function Header({
     try {
       const resp = await conversationService.getTotalUnreadmessage();
       dpUpdateTotalUnreadMessage(resp.data);
+      setCheckPaidMedia(true);
     } catch (e) {
       const error = await e;
       toast.error(error?.message || 'Das Laden der Gesamtanzahl ungelesener Nachrichten ist fehlgeschlagen.');

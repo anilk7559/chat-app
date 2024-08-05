@@ -16,8 +16,8 @@ const nextConfig = {
   swcMinify: true,
   publicRuntimeConfig: {
     // Will be available on both server and client
-    API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT || 'https://chat-app-eaxp.onrender.com/v1',
-    SOCKET_ENDPOINT: process.env.NEXT_PUBLIC_SOCKET_ENDPOINT || 'https://chat-app-eaxp.onrender.com',
+    API_ENDPOINT: process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:8080/v1',
+    SOCKET_ENDPOINT: process.env.NEXT_PUBLIC_SOCKET_ENDPOINT || 'http://localhost:8080',
   },
   async rewrites() {
     return [

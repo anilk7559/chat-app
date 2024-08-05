@@ -104,7 +104,7 @@ function ContactContent({ contact }: IProps) {
             </svg>
           </div>
         </li>
-        <li className="list-group-item">
+        {/* <li className="list-group-item">
           <div className="media align-items-center">
             <div className="media-body">
               <p className="small text-muted mb-0">Adresse</p>
@@ -119,7 +119,7 @@ function ContactContent({ contact }: IProps) {
               />
             </svg>
           </div>
-        </li>
+        </li> */}
       </ul>
     </div>
   );

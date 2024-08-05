@@ -46,12 +46,21 @@ exports.search = async (req, res, next) => {
   const take = parseInt(req.query.take, 10) || 10;
 
   try {
+    // Populate the query based on the request parameters
     const query = Helper.App.populateDbQuery(req.query, {
       equal: ['userId', 'mediaType', 'isApproved']
     });
 
+    // Add a condition to exclude documents without userId
+    query.userId = { $exists: true, $ne: null };
+
+    // Populate the sort parameters based on the request parameters
     const sort = Helper.App.populateDBSort(req.query);
-    const count = await DB.SellItem.count(query);
+
+    // Count the number of documents matching the query
+    const count = await DB.SellItem.countDocuments(query);
+
+    // Find the documents matching the query with pagination and sorting
     const items = await DB.SellItem.find(query)
       .populate({
         path: 'media',
@@ -65,6 +74,8 @@ exports.search = async (req, res, next) => {
       .skip(page * take)
       .limit(take)
       .exec();
+
+    // Transform the items to include the public profile of the model
     res.locals.search = {
       count,
       items: items.map((item) => {
@@ -73,11 +84,13 @@ exports.search = async (req, res, next) => {
         return data;
       })
     };
+
     return next();
   } catch (e) {
     return next(e);
   }
 };
+
 
 exports.update = async (req, res, next) => {
   try {

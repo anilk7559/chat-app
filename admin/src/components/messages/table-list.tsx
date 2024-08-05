@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { messageService } from '@services/message.service';
 import MainPaginate from '@components/paginate/main-paginate';
 import FormFilter from './form-filter';
+import { useRouter } from 'next/navigation';
 
 const initialQuery = {
   page: 1,
@@ -16,9 +17,11 @@ const initialQuery = {
 } as any;
 
 function TableMessages() {
+  const navigate = useRouter();
   const [query, setQuery] = React.useState(initialQuery);
   const [totalMessage, setTotalMessage] = React.useState(0);
   const [dataMessage, setDataMessage] = React.useState({} as any);
+  const [findMessageQuery, setFindMessageQuery] = React.useState({} as any);
 
   const loadMessages = async () => {
     try {
@@ -31,18 +34,40 @@ function TableMessages() {
     }
   };
 
+  const loadFindMessages = async () => {
+    try {
+      const resp = await messageService.findConversation(findMessageQuery);
+      navigate.push(`http://localhost:8081/conversation/${resp.conversationId}`);
+    } catch (e) {
+      const err = await e;
+      toast.error(err?.message || 'Load data message failed!');
+    }
+  };
+
   const onFilter = (values: any) => {
     setQuery({
       ...query,
       userId: values.userId,
-      modelId: values.modelId,
-      page: 1
+      modelId: values.modelId
+    });
+  };
+
+  const onFindFilter = (userId, modelId) => {
+    setFindMessageQuery({
+      id1: userId,
+      id2: modelId
     });
   };
 
   React.useEffect(() => {
     loadMessages();
   }, [query]);
+
+  React.useEffect(() => {
+    if (findMessageQuery.id1 && findMessageQuery.id2) {
+      loadFindMessages();
+    }
+  }, [findMessageQuery]);
 
   return (
     <>
@@ -63,7 +88,7 @@ function TableMessages() {
           <tbody>
             {dataMessage && dataMessage.length > 0 ? (
               dataMessage.map((item: any, index:number) => (
-                <tr key={index as any}>
+                <tr key={index as any} onClick={()=> onFindFilter(item.senderId, item.recipientId)}>
                   <td>{item.sender && item.sender.username}</td>
                   <td><span>{item.text}</span></td>
                   <td>

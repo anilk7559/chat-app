@@ -465,17 +465,22 @@ function Home({ authUser, dispatchSetLogin }: IProps & PropsFromRedux) {
                    <div >No result found</div>
                    ) : (
                    dummyData.map((data, index) => (
-                  <div
+                 <Link href={`/auth/login`} key={index} className="d-block"
+                 style={{ position: "relative", margin: "auto", }}
+
+                 >
+                   <div
                     key={index}
-                    style={{
+                       style={{
                       margin: "auto",
                       border: "1px solid #e3e3e3",
                       borderRadius: "11px",
                       marginTop: "10px"
                     }}
+                 
                   >
                     <div
-                      style={{ position: "relative", margin: "10px" }}
+                      // style={{ position: "relative", margin: "10px" }}
                       onMouseEnter={() => setHoveredIndex(data._id)}
                       onMouseLeave={() => setHoveredIndex(null)}
                     >
@@ -614,6 +619,7 @@ function Home({ authUser, dispatchSetLogin }: IProps & PropsFromRedux) {
                       </div>
                     </div>
                   </div>
+                 </Link>
                     ))
                )}
               </div>
@@ -621,25 +627,9 @@ function Home({ authUser, dispatchSetLogin }: IProps & PropsFromRedux) {
             <br />
             <br />
             <br />
-            {/* <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-              <button onClick={prevPage} disabled={page === 1}>Previous</button>
-              <button onClick={nextPage} disabled={(page + 1) * perPage < totalCount}>Next</button>
-            </div> */}
-
-{/* <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-  {page > 1 && (
-    <button onClick={prevPage}>Previous</button>
-  )}
-  <span style={{ margin: "0 10px" }}>
-    Page {page} of {Math.ceil(totalCount / perPage)}
-  </span>
-  {((page * perPage) < totalCount) && (
-    <button onClick={nextPage}>Next</button>
-  )}
-</div> */}
           </div>
         </div>
-        <div
+        {/* <div
           className={`modal ${isModalOpen ? "show" : ""}`}
           role="dialog"
           style={{
@@ -790,7 +780,7 @@ function Home({ authUser, dispatchSetLogin }: IProps & PropsFromRedux) {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );

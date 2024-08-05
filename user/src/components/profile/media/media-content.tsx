@@ -294,9 +294,9 @@ function MediaContent({
   {itemsVideo?.length > 0 && totalVideo > 0 && totalVideo > take && <MainPaginate currentPage={pageVideo} pageTotal={totalVideo} pageNumber={take} setPage={setPageVideo} />}
         </Tab>
 
-          <Tab eventKey="pending" title={`Pending Photos (${pendingPhotos?.length})`}>
+          <Tab eventKey="pending" title={`Pending Photos (${photoFolders?.length})`}>
   {loading && <Loading />}
-  {!loading && pendingPhotos?.length > 0 ? (
+  {!loading && photoFolders?.length > 0 ? (
     <Row className=''>
       {pendingPhotoFolders?.map((folder: any, index: any) => (
         <article key={folder._id + index} style={{ width: selectedFolderId === folder._id ? '100%' : '30%' }}>

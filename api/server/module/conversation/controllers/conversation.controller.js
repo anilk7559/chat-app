@@ -160,7 +160,7 @@ exports.findOne = async (req, res, next) => {
     newData.userMetaData = metaData || {};
     newData.unreadMessageCount = metaData?.unreadMessageCount || 0;
 
-    res.locals.conversation = newData;
+    res.locals.conversation = newData;    
     return next();
   } catch (e) {
     return next(e);
@@ -335,6 +335,36 @@ exports.loadTotalUnreadMessage = async (req, res, next) => {
 
     res.locals.totalUnreadMessage = data && data.length ? data[0].totalUnreadMessage : 0;
     return next();
+  } catch (e) {
+    return next(e);
+  }
+};
+
+
+exports.findConversationByMembers = async (req, res, next) => {
+  try {
+    const { id1, id2 } = req.query;
+
+    if (!id1 || !id2) {
+      return res.status(400).json({ error: 'Both member IDs are required' });
+    }
+
+    const query = {
+      memberIds: { $all: [id1, id2] },
+      deletedByIds: { $nin: [id1, id2] }
+    };
+
+    const conversation = await DB.Conversation.findOne(query)
+      .sort({ updatedAt: -1 })
+      .exec();
+
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation not found' });
+    }    
+    // res.locals.conversationId = conversation._id;
+    res.status(200).json({ code: 200, message: "OK", error: false, conversationId: conversation._id });
+
+    // return next();
   } catch (e) {
     return next(e);
   }

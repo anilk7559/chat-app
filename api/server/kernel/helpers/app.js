@@ -21,8 +21,7 @@ exports.getPublicFileUrl = (filePath) => {
 
   // todo - add query to check auth of image
   const newPath = filePath.indexOf('public/') === 0 ? filePath.replace('public/', '') : filePath;
-  const baseUrl = 'https://chat-app-eaxp.onrender.com/' || nconf.get('baseUrl');
-  // const baseUrl = nconf.get('baseUrl');
+  const baseUrl = nconf.get('baseUrl');
   return url.resolve(baseUrl, newPath);
 
 };

@@ -30,7 +30,14 @@ module.exports = (router) => {
     conversationController.list,
     Middleware.Response.success('list')
   );
+// findConversationByMembers
 
+router.get(
+  '/v1/conversation/findConversationByMembers',
+  Middleware.isAuthenticated,
+  conversationController.findConversationByMembers,
+  Middleware.Response.success('findConversationByMembers')
+);
   /**
    * @apiGroup Conversation
    * @apiVersion 1.0.0
